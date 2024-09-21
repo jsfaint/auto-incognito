@@ -1,3 +1,19 @@
+function checkWhitelist(url) {
+    const whitelist = [
+        "about:blank",
+        "chrome://",
+        "edge://",
+    ]
+
+    for (const u of whitelist) {
+        if (url.includes(u)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 document.getElementById('addCurrentTabButton').addEventListener('click', function () {
     // 获取当前活动的标签页
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -7,6 +23,10 @@ document.getElementById('addCurrentTabButton').addEventListener('click', functio
 
         const url = tabs[0].url; // 获取当前标签的 URL
         const hostname = new URL(url).hostname; // 提取域名
+
+        if (checkWhitelist(url)) {
+            return;
+        }
 
         // 提取一级域名
         const parts = hostname.split('.');
