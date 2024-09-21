@@ -8,11 +8,17 @@ document.getElementById('addCurrentTabButton').addEventListener('click', functio
         const url = tabs[0].url; // 获取当前标签的 URL
         const hostname = new URL(url).hostname; // 提取域名
 
-        // 将域名添加到黑名单
+        // 提取一级域名
+        const parts = hostname.split('.');
+        const tld = parts.pop(); // 顶级域名
+        const secondLevelDomain = parts.pop(); // 第二级域名
+        const primaryDomain = secondLevelDomain + '.' + tld; // 组合成一级域名
+
+        // 将一级域名添加到黑名单
         chrome.storage.sync.get(['blacklist'], function (result) {
             const blacklist = result.blacklist || [];
-            if (!blacklist.includes(hostname)) { // 检查是否已存在
-                blacklist.push(hostname);
+            if (!blacklist.includes(primaryDomain)) { // 检查是否已存在
+                blacklist.push(primaryDomain);
                 chrome.storage.sync.set({ blacklist }, displayBlacklist);
             }
         });
