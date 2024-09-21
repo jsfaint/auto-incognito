@@ -28,15 +28,17 @@ document.getElementById('addCurrentTabButton').addEventListener('click', functio
 // 现有的添加网址到黑名单的代码...
 document.getElementById('addButton').addEventListener('click', function () {
     const urlInput = document.getElementById('urlInput').value.trim();
-    if (urlInput) {
-        chrome.storage.sync.get(['blacklist'], function (result) {
-            const blacklist = result.blacklist || [];
-            if (!blacklist.includes(urlInput)) {
-                blacklist.push(urlInput);
-                chrome.storage.sync.set({ blacklist }, displayBlacklist);
-            }
-        });
+    if (!urlInput) {
+        return;
     }
+
+    chrome.storage.sync.get(['blacklist'], function (result) {
+        const blacklist = result.blacklist || [];
+        if (!blacklist.includes(urlInput)) {
+            blacklist.push(urlInput);
+            chrome.storage.sync.set({ blacklist }, displayBlacklist);
+        }
+    });
 });
 
 // 显示黑名单
