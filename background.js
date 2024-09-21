@@ -1,13 +1,16 @@
 chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
+    if (!details) {
+        return;
+    }
+
     // 首先，查询当前活动标签的信息
     chrome.tabs.get(details.tabId, function (tab) {
-        if (tab.incognito) {
-            return; // 跳过隐私标签页
+        if (chrome.runtime.lastError) {
+            return; // 如果获取标签信息失败，直接返回
         }
 
-        if (chrome.runtime.lastError) {
-            console.error(`获取标签信息失败: ${chrome.runtime.lastError}`);
-            return; // 如果获取标签信息失败，直接返回
+        if (!tab || tab.incognito) {
+            return;
         }
 
         chrome.storage.sync.get(['blacklist'], function (result) {
@@ -21,13 +24,12 @@ chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
                         url: url,
                         incognito: true
                     }, function () {
-                        // 只关闭普通模式的标签页
-                        if (!tab.incognito) { // 检查当前标签是否是隐私模式
-                            chrome.tabs.remove(details.tabId);
-                        }
+                        // 关闭当前标签页
+                        chrome.tabs.remove(details.tabId);
                         // 从历史记录中删除该网址
                         chrome.history.deleteUrl({ url: url });
                     });
+
                     break; // 找到匹配后退出循环
                 }
             }
