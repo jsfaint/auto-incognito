@@ -20,6 +20,8 @@ document.getElementById('addCurrentTabButton').addEventListener('click', functio
             if (!blacklist.includes(primaryDomain)) { // 检查是否已存在
                 blacklist.push(primaryDomain);
                 chrome.storage.sync.set({ blacklist }, displayBlacklist);
+
+                chrome.tabs.reload(tabs[0].id)
             }
         });
     });
