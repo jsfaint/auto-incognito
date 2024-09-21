@@ -1,6 +1,10 @@
 document.getElementById('addCurrentTabButton').addEventListener('click', function () {
     // 获取当前活动的标签页
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        if (tabs.length <= 0) {
+            return;
+        }
+
         const url = tabs[0].url; // 获取当前标签的 URL
         const hostname = new URL(url).hostname; // 提取域名
 

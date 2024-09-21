@@ -5,6 +5,11 @@ chrome.webNavigation.onBeforeNavigate.addListener(function (details) {
             return; // 跳过隐私标签页
         }
 
+        if (chrome.runtime.lastError) {
+            console.error(`获取标签信息失败: ${chrome.runtime.lastError}`);
+            return; // 如果获取标签信息失败，直接返回
+        }
+
         chrome.storage.sync.get(['blacklist'], function (result) {
             const blacklist = result.blacklist || [];
             const url = details.url;
