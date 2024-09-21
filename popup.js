@@ -1,14 +1,35 @@
+document.getElementById('addCurrentTabButton').addEventListener('click', function () {
+    // 获取当前活动的标签页
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        const url = tabs[0].url; // 获取当前标签的 URL
+        const hostname = new URL(url).hostname; // 提取域名
+
+        // 将域名添加到黑名单
+        chrome.storage.sync.get(['blacklist'], function (result) {
+            const blacklist = result.blacklist || [];
+            if (!blacklist.includes(hostname)) { // 检查是否已存在
+                blacklist.push(hostname);
+                chrome.storage.sync.set({ blacklist }, displayBlacklist);
+            }
+        });
+    });
+});
+
+// 现有的添加网址到黑名单的代码...
 document.getElementById('addButton').addEventListener('click', function () {
     const urlInput = document.getElementById('urlInput').value.trim();
     if (urlInput) {
         chrome.storage.sync.get(['blacklist'], function (result) {
             const blacklist = result.blacklist || [];
-            blacklist.push(urlInput);
-            chrome.storage.sync.set({ blacklist }, displayBlacklist);
+            if (!blacklist.includes(urlInput)) {
+                blacklist.push(urlInput);
+                chrome.storage.sync.set({ blacklist }, displayBlacklist);
+            }
         });
     }
 });
 
+// 显示黑名单
 function displayBlacklist() {
     chrome.storage.sync.get(['blacklist'], function (result) {
         const blacklist = result.blacklist || [];
