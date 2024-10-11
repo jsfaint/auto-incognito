@@ -3,14 +3,30 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
-    <h1>黑名单管理</h1>
-    <button id="addCurrentTabButton">添加当前标签</button>
-    <input type="text" id="urlInput" placeholder="输入要添加的网址">
-    <button id="addButton">添加到黑名单</button>
-    <ul id="blacklist"></ul>
+    <div class="password-form" id="password-form" hidden>
+        <h3>Set Password</h3>
+        <input type="password" id="new-password" placeholder="请输入新密码">
+        <button id="set-password">设置密码</button>
+    </div>
+
+    <div class="password-form" id="verify-password-form" hidden>
+        <h3>请输入密码</h3>
+        <input type="password" id="verify-password" placeholder="请输入密码">
+        <button id="verify-password-btn">验证密码</button>
+    </div>
+
+    <div class="blacklist" id="blacklist-manager" hidden>
+        <h1>黑名单管理</h1>
+        <button id="addCurrentTabButton">添加当前标签</button>
+        <input type="text" id="urlInput" placeholder="输入要添加的网址">
+        <button id="addButton">添加到黑名单</button>
+        <ul id="blacklist"></ul>
+    </div>
+
     <script src="popup.js"></script>
 </body>
 
