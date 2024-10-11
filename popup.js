@@ -98,9 +98,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (data.password) {
             // 如果已经设置了密码，显示验证密码的表单
             verifyPasswordForm.removeAttribute('hidden');
+            document.getElementById('verify-password').focus();
         } else {
             // 如果没有设置密码，显示设置密码的表单
             passwordForm.removeAttribute('hidden');
+            document.getElementById('new-password').focus();
         }
     });
 
@@ -139,6 +141,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 passwordForm.setAttribute('hidden', '');
 
                 blacklist.removeAttribute('hidden');
+
+                // 将光标聚焦在输入框上
+                document.getElementById('urlInput').focus();
             } else {
                 alert('密码错误');
             }
