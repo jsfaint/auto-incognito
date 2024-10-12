@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "自动隐私模式",
     "description": "自动隐私模式",
-    "version": "0.1",
+    "version": "0.2",
     "permissions": [
         "storage",
         "tabs",
