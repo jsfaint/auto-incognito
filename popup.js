@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
     function checkWhitelist(url) {
         const whitelist = new Set([
             "about:blank",
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return false;
     }
 
-    document.getElementById('addCurrentTabButton').addEventListener('click', function () {
+    document.getElementById('addCurrentTabButton').addEventListener('click', () => {
         // 获取当前活动的标签页
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             if (tabs.length <= 0) {
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const primaryDomain = secondLevelDomain + '.' + tld; // 组合成一级域名
 
             // 将一级域名添加到黑名单
-            chrome.storage.sync.get(['blacklist'], function (result) {
+            chrome.storage.sync.get(['blacklist'], (result) => {
                 const blacklist = result.blacklist || [];
                 if (!blacklist.includes(primaryDomain)) { // 检查是否已存在
                     blacklist.push(primaryDomain);
@@ -49,13 +49,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // 现有的添加网址到黑名单的代码...
-    document.getElementById('addButton').addEventListener('click', function () {
+    document.getElementById('addButton').addEventListener('click', () => {
         const urlInput = document.getElementById('urlInput').value.trim();
         if (!urlInput) {
             return;
         }
 
-        chrome.storage.sync.get(['blacklist'], function (result) {
+        chrome.storage.sync.get(['blacklist'], (result) => {
             const blacklist = result.blacklist || [];
             if (!blacklist.includes(urlInput)) {
                 blacklist.push(urlInput);
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 显示黑名单
     function displayBlacklist() {
-        chrome.storage.sync.get(['blacklist'], function (result) {
+        chrome.storage.sync.get(['blacklist'], (result) => {
             const blacklist = result.blacklist || [];
             const blacklistElement = document.getElementById('blacklist');
             blacklistElement.innerHTML = '';
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function removeFromBlacklist(url) {
-        chrome.storage.sync.get(['blacklist'], function (result) {
+        chrome.storage.sync.get(['blacklist'], (result) => {
             let blacklist = result.blacklist || [];
             blacklist = blacklist.filter(item => item !== url);
             chrome.storage.sync.set({ blacklist }, displayBlacklist);
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const blacklist = document.getElementById('blacklist-manager');
 
     // 检查是否已经设置了密码
-    chrome.storage.sync.get('password', function (data) {
+    chrome.storage.sync.get('password', (data) => {
         if (data.password) {
             // 如果已经设置了密码，显示验证密码的表单
             verifyPasswordForm.removeAttribute('hidden');
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function setPassword() {
         const newPassword = document.getElementById('new-password').value;
         if (newPassword) {
-            chrome.storage.sync.set({ password: newPassword }, function () {
+            chrome.storage.sync.set({ password: newPassword }, () => {
                 verifyPasswordForm.removeAttribute('hidden', '');
                 passwordForm.setAttribute('hidden', '');
 
@@ -121,12 +121,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 设置密码
-    document.getElementById('set-password').addEventListener('click', function () {
+    document.getElementById('set-password').addEventListener('click', () => {
         setPassword();
     });
 
     // 设置密码 监听回车键事件
-    document.getElementById('new-password').addEventListener('keydown', function (event) {
+    document.getElementById('new-password').addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             setPassword();
         }
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function verifyPassword() {
         const enteredPassword = document.getElementById('verify-password').value;
 
-        chrome.storage.sync.get('password', function (data) {
+        chrome.storage.sync.get('password', (data) => {
             if (enteredPassword === data.password) {
                 verifyPasswordForm.setAttribute('hidden', '');
                 passwordForm.setAttribute('hidden', '');
@@ -151,12 +151,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 验证密码
-    document.getElementById('verify-password-btn').addEventListener('click', function () {
+    document.getElementById('verify-password-btn').addEventListener('click', () => {
         verifyPassword();
     });
 
     // 验证密码 监听回车键事件
-    document.getElementById('verify-password').addEventListener('keydown', function (event) {
+    document.getElementById('verify-password').addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             verifyPassword();
         }
