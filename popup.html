@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
+<title>Auto Private Mode</title>
 
 <head>
     <meta charset="UTF-8">
@@ -10,10 +11,11 @@
     <script src="lib/whitelist.js"></script>
     <script src="lib/blacklist.js"></script>
     <script src="lib/password.js"></script>
+    <script src="lib/private.js"></script>
 
     <div class="password-form" id="password-form" hidden>
         <h3>Set Password</h3>
-        <input type="password" id="new-password" placeholder="请输入新密码">
+        <input type="text" id="new-password" placeholder="请输入新密码">
         <button id="set-password">设置密码</button>
     </div>
 
@@ -25,9 +27,23 @@
 
     <div class="blacklist" id="blacklist-manager" hidden>
         <h1>黑名单管理</h1>
+
+        <div>
+            <input type="checkbox" id="in-private-mode" value="false">
+            是否进入隐私模式
+        </div>
+
+        <hr>
+        </hr>
+
         <button id="addCurrentTabButton">添加当前标签</button>
         <input type="text" id="urlInput" placeholder="输入要添加的网址">
         <button id="addButton">添加到黑名单</button>
+
+        <hr>
+        </hr>
+
+        <div>黑名单：</div>
         <ul id="blacklist"></ul>
     </div>
 

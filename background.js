@@ -1,38 +1,62 @@
+"use strict";
+
 try {
-    importScripts('lib/blacklist.js');
+    importScripts('lib/blacklist.js', 'lib/whitelist.js', 'lib/private.js');
 } catch (e) {
     console.error(e);
 }
 
 chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
-    try {
-        const tab = await chrome.tabs.get(details.tabId);
-        if (chrome.runtime.lastError) {
-            return; // 如果获取标签信息失败，直接返回
-        }
+    // 如果private mode未打开，则不需要在此listener中处理
+    const privateOption = await getPrivateOption();
+    if (!privateOption) {
+        return;
+    }
 
-        if (tab === undefined || tab.incognito) {
+    const tab = await chrome.tabs.get(details.tabId);
+    if (tab === undefined || tab.incognito) {
+        return;
+    }
+
+    const url = details.url;
+
+    // 如果地址在白名单中，则跳过
+    if (findInWhitelist(url)) {
+        return;
+    }
+
+    const found = findInBlacklist(url);
+    if (!found) {
+        return;
+    }
+
+    // 创建一个新的隐私窗口
+    chrome.windows.create({
+        url: url,
+        incognito: true
+    });
+
+    // 关闭当前标签页
+    chrome.tabs.remove(details.tabId);
+    // 从历史记录中删除该网址
+    chrome.history.deleteUrl({ url: url });
+}, { url: [{ urlMatches: '.*' }] });
+
+// 监听标签页更新事件
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
+        const privateOption = await getPrivateOption();
+        // 如果private mode已打开，则不需要在此listener中处理
+        if (privateOption) {
             return;
         }
 
-        const url = details.url;
-
-        const blacklist = await getBlacklist();
-
-        let found = findInList(url, blacklist);
-        if (found) {
-            // 创建一个新的隐私窗口
-            await chrome.windows.create({
-                url: url,
-                incognito: true
-            });
-
-            // 关闭当前标签页
-            await chrome.tabs.remove(details.tabId);
-            // 从历史记录中删除该网址
-            await chrome.history.deleteUrl({ url: url });
+        const found = findInBlacklist(tab.url);
+        if (!found) {
+            return;
         }
-    } catch (error) {
-        console.error('auto incognito: ', error);
-    }
-}, { url: [{ urlMatches: '.*' }] });
+
+        // 清除该标签页的访问历史
+        chrome.history.deleteUrl({ url: tab.url });
+    });
+});

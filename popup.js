@@ -1,10 +1,12 @@
+"use strict";
+
 document.addEventListener('DOMContentLoaded', async () => {
     const passwordForm = document.getElementById('password-form');
     const setPasswordButton = document.getElementById('set-password');
     const verifyPasswordForm = document.getElementById('verify-password-form');
     const blacklistDiv = document.getElementById('blacklist-manager');
 
-    const inPrivateMode = document.getElementById('in-private-mode');
+    const privateMode = document.getElementById('in-private-mode');
 
     const verifyInput = document.getElementById('verify-password');
     const verifyButton = document.getElementById('verify-password-btn');
@@ -14,7 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const addCurrentTabButton = document.getElementById('addCurrentTabButton');
     const addButton = document.getElementById('addButton');
     const urlInput = document.getElementById('urlInput');
-
 
     // 显示黑名单
     async function displayBlacklist() {
@@ -50,6 +51,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    async function addInputBlackList() {
+        const url = urlInput.value.trim();
+        if (!url) {
+            return;
+        }
+
+        const blacklist = await getBlacklist();
+        if (!findInList(url, blacklist)) {
+            blacklist.push(url);
+            await setBlacklist(blacklist);
+            displayBlacklist();
+        }
+    }
+
+    // 检查private mode是否开启
+    const privateOption = await getPrivateOption();
+
+    if (privateOption === undefined) {
+        privateMode.checked = true;
+        await setPrivateOption(true);
+    }
+
+    if (privateOption) {
+        privateMode.checked = true;
+    } else {
+        privateMode.checked = false;
+    }
+
+    privateMode.addEventListener('change', async () => {
+        await setPrivateOption(privateMode.checked);
+    });
+
     // 点击添加黑名单
     addCurrentTabButton.addEventListener('click', async () => {
         // 获取当前活动的标签页
@@ -83,19 +116,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    urlInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            addInputBlackList();
+        }
+    });
+
     // 现有的添加网址到黑名单的代码...
     addButton.addEventListener('click', async () => {
-        url = urlInput.trim();
-        if (!url) {
-            return;
-        }
-
-        const blacklist = await getBlacklist();
-        if (!findInList(url, blacklist)) {
-            blacklist.push(url);
-            await setBlacklist(blacklist);
-            displayBlacklist();
-        }
+        addInputBlackList();
     });
 
     // 检查是否已经设置了密码
