@@ -71,12 +71,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (privateOption === undefined) {
         privateMode.checked = true;
         await setPrivateOption(true);
-    }
-
-    if (privateOption) {
-        privateMode.checked = true;
     } else {
-        privateMode.checked = false;
+        privateMode.checked = privateOption;
     }
 
     privateMode.addEventListener('change', async () => {
