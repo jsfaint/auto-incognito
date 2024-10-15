@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlInput = document.getElementById('urlInput');
 
     // 显示黑名单
-    async function displayBlacklist() {
+    const displayBlacklist = async () => {
         const blacklist = await getBlacklist();
         const blacklistElement = document.getElementById('blacklist');
 
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 验证密码
-    async function verifyPassword() {
+    const verifyPassword = async () => {
         const enteredPassword = verifyInput.value;
 
         const password = await getPassword();
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function addInputBlackList() {
+    const addInputBlackList = async () => {
         const url = urlInput.value.trim();
         if (!url) {
             return;
