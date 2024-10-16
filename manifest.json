@@ -1,8 +1,9 @@
 {
     "manifest_version": 3,
-    "name": "自动隐私模式",
-    "description": "自动隐私模式",
-    "version": "0.3.1",
+    "name": "__MSG_extension_name__",
+    "description": "__MSG_extension_description__",
+    "version": "0.4.0",
+    "default_locale": "en",
     "permissions": [
         "storage",
         "tabs",

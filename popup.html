@@ -14,36 +14,36 @@
     <script src="lib/private.js"></script>
 
     <div class="password-form" id="password-form" hidden>
-        <h3>Set Password</h3>
-        <input type="text" id="new-password" placeholder="请输入新密码">
-        <button id="set-password">设置密码</button>
+        <h3>__MSG_label_password_set__</h3>
+        <input type="text" id="new-password" placeholder=__MSG_placeholder_password__>
+        <button id="set-password">__MSG_button_set_password__</button>
     </div>
 
     <div class="password-form" id="verify-password-form" hidden>
-        <h3>请输入密码</h3>
-        <input type="password" id="verify-password" placeholder="请输入密码">
-        <button id="verify-password-btn">验证密码</button>
+        <h3>__MSG_label_verify_password__</h3>
+        <input type="password" id="verify-password" placeholder=__MSG_placeholder_password__>
+        <button id="verify-password-btn">__MSG_button_verify_password__</button>
     </div>
 
     <div class="blacklist" id="blacklist-manager" hidden>
-        <h1>黑名单管理</h1>
+        <h1>__MSG_label_blacklist_management__</h1>
 
         <div>
             <input type="checkbox" id="in-private-mode">
-            是否进入隐私模式
+            __MSG_label_private_mode__
         </div>
 
         <hr>
         </hr>
 
-        <button id="addCurrentTabButton">添加当前标签</button>
-        <input type="text" id="urlInput" placeholder="输入要添加的网址">
-        <button id="addButton">添加到黑名单</button>
+        <button id="addCurrentTabButton">__MSG_button_add_current_tab__</button>
+        <input type="text" id="urlInput" placeholder=__MSG_placeholder_blacklist__>
+        <button id="addButton">__MSG_button_add_blacklist__</button>
 
         <hr>
         </hr>
 
-        <div>黑名单：</div>
+        <div>__MSG_label_blacklist__</div>
         <ul id="blacklist"></ul>
     </div>
 

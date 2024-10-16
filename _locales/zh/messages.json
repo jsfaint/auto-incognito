@@ -1,0 +1,50 @@
+{
+    "extension_name": {
+        "message": "自动隐私模式"
+    },
+    "extension_description": {
+        "message": "访问黑名单中网站时自动使用隐私模式访问"
+    },
+    "label_set_password": {
+        "message": "设置密码"
+    },
+    "placeholder_password": {
+        "message": "请输入密码"
+    },
+    "button_set_password": {
+        "message": "设置密码"
+    },
+    "label_verify_password": {
+        "message": "请输入密码"
+    },
+    "button_verify_password": {
+        "message": "验证密码"
+    },
+    "label_blacklist_management": {
+        "message": "黑名单管理"
+    },
+    "label_private_mode": {
+        "message": "是否进入隐私模式"
+    },
+    "button_add_current_tab": {
+        "message": "添加当前标签页"
+    },
+    "placeholder_blacklist": {
+        "message": "请输入要添加的网址"
+    },
+    "button_add_blacklist": {
+        "message": "添加到黑名单"
+    },
+    "label_blacklist": {
+        "message": "黑名单："
+    },
+    "info_verify_password": {
+        "message": "密码错误！"
+    },
+    "info_set_password_success": {
+        "message": "设置密码成功"
+    },
+    "info_set_password_hint": {
+        "message": "请输入新密码！"
+    }
+}

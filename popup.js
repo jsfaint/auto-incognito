@@ -1,6 +1,23 @@
 "use strict";
 
 document.addEventListener('DOMContentLoaded', async () => {
+    (() => {
+        //Localize by replacing __MSG_***__ meta tags
+        var objects = document.getElementsByTagName('html');
+        for (var j = 0; j < objects.length; j++) {
+            var obj = objects[j];
+
+            var valStrH = obj.innerHTML.toString();
+            var valNewH = valStrH.replace(/__MSG_(\w+)__/g, function (match, v1) {
+                return v1 ? chrome.i18n.getMessage(v1) : "";
+            });
+
+            if (valNewH != valStrH) {
+                obj.innerHTML = valNewH;
+            }
+        }
+    })();
+
     const passwordForm = document.getElementById('password-form');
     const setPasswordButton = document.getElementById('set-password');
     const verifyPasswordForm = document.getElementById('verify-password-form');
@@ -17,7 +34,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const addButton = document.getElementById('addButton');
     const urlInput = document.getElementById('urlInput');
 
-    // 显示黑名单
     const displayBlacklist = async () => {
         const blacklist = await getBlacklist();
         const blacklistElement = document.getElementById('blacklist');
@@ -33,7 +49,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 验证密码
     const verifyPassword = async () => {
         const enteredPassword = verifyInput.value;
 
@@ -44,10 +59,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             blacklistDiv.removeAttribute('hidden');
 
-            // 将光标聚焦在输入框上
             urlInput.focus();
         } else {
-            alert('密码错误');
+            alert(chrome.i18n.getMessage("info_verify_password"));
         }
     }
 
@@ -65,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 检查private mode是否开启
+    // check if private option was set
     const privateOption = await getPrivateOption();
 
     if (privateOption === undefined) {
@@ -79,31 +93,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         await setPrivateOption(privateMode.checked);
     });
 
-    // 点击添加黑名单
     addCurrentTabButton.addEventListener('click', async () => {
-        // 获取当前活动的标签页
+        // Get the currently active tab
         const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
         if (tabs.length <= 0) {
             return;
         }
 
-        const url = tabs[0].url; // 获取当前标签的 URL
-        const hostname = new URL(url).hostname; // 提取域名
+        const url = tabs[0].url; // get url of current tab
+        const hostname = new URL(url).hostname; // extract the domain url
 
         if (findInWhitelist(url)) {
             return;
         }
 
-        // 提取一级域名
         const parts = hostname.split('.');
-        const tld = parts.pop(); // 顶级域名
-        const secondLevelDomain = parts.pop(); // 第二级域名
-        const primaryDomain = secondLevelDomain + '.' + tld; // 组合成一级域名
+        const tld = parts.pop();
+        const secondLevelDomain = parts.pop();
+        const primaryDomain = `${secondLevelDomain}.${tld}`;
 
-        // 将一级域名添加到黑名单
         const blacklist = await getBlacklist();
 
-        if (!findInList(primaryDomain, blacklist)) { // 检查是否已存在
+        if (!findInList(primaryDomain, blacklist)) {
             blacklist.push(primaryDomain);
             await setBlacklist(blacklist);
             displayBlacklist();
@@ -118,24 +129,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 现有的添加网址到黑名单的代码...
     addButton.addEventListener('click', async () => {
         addInputBlackList();
     });
 
-    // 检查是否已经设置了密码
+    // Check if the password was set
     const password = await getPassword();
     if (password) {
-        // 如果已经设置了密码，显示验证密码的表单
+        // verify password
         verifyPasswordForm.removeAttribute('hidden');
         verifyInput.focus();
     } else {
-        // 如果没有设置密码，显示设置密码的表单
+        // set password
         passwordForm.removeAttribute('hidden');
         newPasswordInput.focus();
     }
 
-    // 设置密码
     setPasswordButton.addEventListener('click', async () => {
         const newPassword = newPasswordInput.value;
         if (newPassword) {
@@ -143,25 +152,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             verifyPasswordForm.removeAttribute('hidden', '');
             passwordForm.setAttribute('hidden', '');
 
-            alert('设置密码成功');
+            alert(chrome.i18n.getMessage("info_set_password_success"));
         } else {
-            alert('请输入密码！');
+            alert(chrome.i18n.getMessage("info_set_password_hint"));
         }
     });
 
-    // 验证密码
     verifyButton.addEventListener('click', () => {
         verifyPassword();
     });
 
-    // 验证密码 监听回车键事件
     verifyInput.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             verifyPassword();
         }
     });
 
-    // 初始显示黑名单
     displayBlacklist();
 });
 

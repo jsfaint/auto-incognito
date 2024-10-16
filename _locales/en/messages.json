@@ -1,0 +1,50 @@
+{
+    "extension_name": {
+        "message": "auto-incognito"
+    },
+    "extension_description": {
+        "message": "Automatically open websites in incognito mode."
+    },
+    "label_set_password": {
+        "message": "Set Password"
+    },
+    "placeholder_password": {
+        "message": "Please input new password"
+    },
+    "button_set_password": {
+        "message": "Set Password"
+    },
+    "label_verify_password": {
+        "message": "Please input password"
+    },
+    "button_verify_password": {
+        "message": "Verify Password"
+    },
+    "label_blacklist_management": {
+        "message": "Blacklist Management"
+    },
+    "label_private_mode": {
+        "message": "Enter private mode"
+    },
+    "button_add_current_tab": {
+        "message": "Add current tab to blacklist"
+    },
+    "placeholder_blacklist": {
+        "message": "Please input the URL to add to the blacklist"
+    },
+    "button_add_blacklist": {
+        "message": "Add to blacklist"
+    },
+    "label_blacklist": {
+        "message": "Blacklist: "
+    },
+    "info_verify_password": {
+        "message": "Invalid password!"
+    },
+    "info_set_password_success": {
+        "message": "Set password successful"
+    },
+    "info_set_password_hint": {
+        "message": "Please input new password!"
+    }
+}
