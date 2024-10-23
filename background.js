@@ -38,7 +38,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
 }, { url: [{ urlMatches: '.*' }] });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
+    const removeHistory = async () => {
         const privateOption = await getPrivateOption();
         // If the private option was enabled, skip it.
         if (privateOption) {
@@ -52,5 +52,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
         // Clear url history of curr
         await chrome.history.deleteUrl({ url: tab.url });
-    });
+    }
+
+    chrome.tabs.onRemoved.addListener(removeHistory);
+
+    chrome.tabs.onReplaced.addListener(removeHistory);
 });
