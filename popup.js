@@ -35,15 +35,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlInput = document.getElementById('urlInput');
 
     const displayBlacklist = async () => {
-        const blacklist = await getBlacklist();
-        const blacklistElement = document.getElementById('blacklist');
+        let blacklist = await getBlacklist();
+        let blacklistElement = document.getElementById('blacklist');
 
         blacklistElement.innerHTML = '';
         blacklist.forEach(url => {
             const li = document.createElement('li');
             li.textContent = url;
-            li.addEventListener('click', () => {
-                removeFromBlacklist(url);
+            li.addEventListener('click', async () => {
+                await removeFromBlacklist(url);
+                displayBlacklist()
             });
             blacklistElement.appendChild(li);
         });
@@ -71,10 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const blacklist = await getBlacklist();
-        if (!findInList(url, blacklist)) {
-            blacklist.push(url);
-            await setBlacklist(blacklist);
+        if (await addToBlacklist(url)) {
             displayBlacklist();
         }
     }
@@ -114,11 +112,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const blacklist = await getBlacklist();
 
-        if (!findInList(primaryDomain, blacklist)) {
-            blacklist.push(primaryDomain);
-            await setBlacklist(blacklist);
+        if (await addToBlacklist(primaryDomain)) {
             displayBlacklist();
-
             chrome.tabs.reload(tabs[0].id)
         }
     });
