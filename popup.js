@@ -62,6 +62,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             urlInput.focus();
         } else {
+            // empty password input
+            verifyPasswordForm.value = "";
             alert(chrome.i18n.getMessage("info_verify_password"));
         }
     }
@@ -73,6 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (await addToBlacklist(url)) {
+            // empty blacklist input
+            urlInput.value = "";
             displayBlacklist();
         }
     }
