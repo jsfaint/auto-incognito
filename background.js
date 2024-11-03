@@ -52,7 +52,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
         // Clear url history of curr
         await chrome.history.deleteUrl({ url: tab.url });
-    }
+    };
 
     chrome.tabs.onRemoved.addListener(removeHistory);
 

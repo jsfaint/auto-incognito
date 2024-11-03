@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlInput = document.getElementById('urlInput');
 
     const displayBlacklist = async () => {
-        let blacklist = await getBlacklist();
-        let blacklistElement = document.getElementById('blacklist');
+        const blacklist = await getBlacklist();
+        const blacklistElement = document.getElementById('blacklist');
 
         blacklistElement.innerHTML = '';
         blacklist.forEach(url => {
@@ -44,11 +44,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             li.textContent = url;
             li.addEventListener('click', async () => {
                 await removeFromBlacklist(url);
-                displayBlacklist()
+                displayBlacklist();
             });
             blacklistElement.appendChild(li);
         });
-    }
+    };
 
     const verifyPassword = async () => {
         const enteredPassword = verifyInput.value;
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             verifyPasswordForm.value = "";
             alert(chrome.i18n.getMessage("info_verify_password"));
         }
-    }
+    };
 
     const addInputBlackList = async () => {
         const url = urlInput.value.trim();
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             urlInput.value = "";
             displayBlacklist();
         }
-    }
+    };
 
     // check if private option was set
     const privateOption = await getPrivateOption();
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (await addToBlacklist(primaryDomain)) {
             displayBlacklist();
-            chrome.tabs.reload(tabs[0].id)
+            chrome.tabs.reload(tabs[0].id);
         }
     });
 
