@@ -37,24 +37,38 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     await chrome.history.deleteUrl({ url: url });
 }, { url: [{ urlMatches: '.*' }] });
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    const removeHistory = async () => {
+// Clear url history
+const removeHistory = async (url) => {
+    try {
         const privateOption = await getPrivateOption();
         // If the private option was enabled, skip it.
         if (privateOption) {
             return;
         }
 
-        const found = await findInBlacklist(tab.url);
+        const found = await findInBlacklist(url);
         if (!found) {
             return;
         }
 
         // Clear url history of curr
-        await chrome.history.deleteUrl({ url: tab.url });
-    };
+        await chrome.history.deleteUrl({ url: url });
+        console.log("History removed: ", url)
+    } catch (e) {
+        console.log("removeHistory: ", e);
+    }
+};
 
-    chrome.tabs.onRemoved.addListener(removeHistory);
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    try {
+        if (changeInfo.url === undefined) {
+            return;
+        }
 
-    chrome.tabs.onReplaced.addListener(removeHistory);
+        chrome.tabs.onRemoved.addListener(async () => {
+            removeHistory(changeInfo.url);
+        });
+    } catch (e) {
+        console.log("onUpdate: ", e);
+    }
 });
