@@ -12,21 +12,36 @@
     <script src="lib/blacklist.js"></script>
     <script src="lib/password.js"></script>
     <script src="lib/private.js"></script>
+    <script src="popup.js"></script>
 
-    <div class="password-form" id="password-form" hidden>
+    <section id="blacklist-manager">
+        <h1>__MSG_label_blacklist_management__</h1>
+        <button id="addCurrentTabButton">__MSG_button_add_current_tab__</button>
+        <input type="text" id="urlInput" placeholder=__MSG_placeholder_blacklist__>
+        <button id="addButton">__MSG_button_add_blacklist__</button>
+    </section>
+
+    <hr>
+    </hr>
+
+    <section id="password-form" hidden>
         <h3>__MSG_label_password_set__</h3>
         <input type="text" id="new-password" placeholder=__MSG_placeholder_password__>
         <button id="set-password">__MSG_button_set_password__</button>
-    </div>
+    </section>
 
-    <div class="password-form" id="verify-password-form" hidden>
+    <section id="verify-password-form" hidden>
         <h3>__MSG_label_verify_password__</h3>
         <input type="password" id="verify-password" placeholder=__MSG_placeholder_password__>
         <button id="verify-password-btn">__MSG_button_verify_password__</button>
-    </div>
+    </section>
 
-    <div class="blacklist" id="blacklist-manager" hidden>
-        <h1>__MSG_label_blacklist_management__</h1>
+    <section id="setting-form" hidden>
+        <div id="password-option-form">
+            <input type="checkbox" id="password-option">
+            __MSG_label_password_option__
+            <button id="clear-password">__MSG_button_clear_password__</button>
+        </div>
 
         <div>
             <input type="checkbox" id="in-private-mode">
@@ -36,18 +51,9 @@
         <hr>
         </hr>
 
-        <button id="addCurrentTabButton">__MSG_button_add_current_tab__</button>
-        <input type="text" id="urlInput" placeholder=__MSG_placeholder_blacklist__>
-        <button id="addButton">__MSG_button_add_blacklist__</button>
-
-        <hr>
-        </hr>
-
         <div>__MSG_label_blacklist__</div>
         <ul id="blacklist"></ul>
-    </div>
-
-    <script src="popup.js"></script>
+    </section>
 </body>
 
 </html>

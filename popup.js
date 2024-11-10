@@ -1,38 +1,44 @@
 "use strict";
 
-document.addEventListener('DOMContentLoaded', async () => {
-    (() => {
-        //Localize by replacing __MSG_***__ meta tags
-        var objects = document.getElementsByTagName('html');
-        for (var j = 0; j < objects.length; j++) {
-            var obj = objects[j];
+const localizeHtmlPage = () => {
+    //Localize by replacing __MSG_***__ meta tags
+    var objects = document.getElementsByTagName('html');
+    for (var j = 0; j < objects.length; j++) {
+        var obj = objects[j];
 
-            var valStrH = obj.innerHTML.toString();
-            var valNewH = valStrH.replace(/__MSG_(\w+)__/g, function (match, v1) {
-                return v1 ? chrome.i18n.getMessage(v1) : "";
-            });
+        var valStrH = obj.innerHTML.toString();
+        var valNewH = valStrH.replace(/__MSG_(\w+)__/g, function (match, v1) {
+            return v1 ? chrome.i18n.getMessage(v1) : "";
+        });
 
-            if (valNewH != valStrH) {
-                obj.innerHTML = valNewH;
-            }
+        if (valNewH != valStrH) {
+            obj.innerHTML = valNewH;
         }
-    })();
+    }
+}
 
-    const passwordForm = document.getElementById('password-form');
-    const setPasswordButton = document.getElementById('set-password');
-    const verifyPasswordForm = document.getElementById('verify-password-form');
-    const blacklistDiv = document.getElementById('blacklist-manager');
+document.addEventListener('DOMContentLoaded', async () => {
+    localizeHtmlPage();
 
-    const privateMode = document.getElementById('in-private-mode');
+    const chkPasswordOption = document.getElementById('password-option');
 
-    const verifyInput = document.getElementById('verify-password');
-    const verifyButton = document.getElementById('verify-password-btn');
+    const formPassword = document.getElementById('password-form');
+    const btnSetPassword = document.getElementById('set-password');
+    const formVerifyPassword = document.getElementById('verify-password-form');
 
-    const newPasswordInput = document.getElementById('new-password');
+    const chkPrivate = document.getElementById('in-private-mode');
 
-    const addCurrentTabButton = document.getElementById('addCurrentTabButton');
-    const addButton = document.getElementById('addButton');
-    const urlInput = document.getElementById('urlInput');
+    const inputVerify = document.getElementById('verify-password');
+    const btnVerify = document.getElementById('verify-password-btn');
+
+    const inputNewPassword = document.getElementById('new-password');
+
+    const btnAddCurrentTab = document.getElementById('addCurrentTabButton');
+    const btnAdd = document.getElementById('addButton');
+    const InputURL = document.getElementById('urlInput');
+
+    const formSetting = document.getElementById('setting-form');
+    const btnClearPassword = document.getElementById('clear-password');
 
     const displayBlacklist = async () => {
         const blacklist = await getBlacklist();
@@ -51,51 +57,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const verifyPassword = async () => {
-        const enteredPassword = verifyInput.value;
+        const enteredPassword = inputVerify.value;
 
         const password = await getPassword();
         if (enteredPassword === password) {
-            verifyPasswordForm.setAttribute('hidden', '');
-            passwordForm.setAttribute('hidden', '');
+            formVerifyPassword.setAttribute('hidden', '');
+            formPassword.setAttribute('hidden', '');
 
-            blacklistDiv.removeAttribute('hidden');
+            formSetting.removeAttribute("hidden");
 
-            urlInput.focus();
+            InputURL.focus();
         } else {
             // empty password input
-            verifyPasswordForm.value = "";
+            formVerifyPassword.value = "";
             alert(chrome.i18n.getMessage("info_verify_password"));
         }
     };
 
     const addInputBlackList = async () => {
-        const url = urlInput.value.trim();
+        const url = InputURL.value.trim();
         if (!url) {
             return;
         }
 
         if (await addToBlacklist(url)) {
             // empty blacklist input
-            urlInput.value = "";
+            InputURL.value = "";
             displayBlacklist();
         }
     };
 
-    // check if private option was set
-    const privateOption = await getPrivateOption();
+    // Initial Option
+    const OptionInit = async () => {
+        // Initial privateOption
+        const privateOption = await getPrivateOption();
+        if (privateOption === undefined) {
+            chkPrivate.checked = true;
+        } else {
+            chkPrivate.checked = privateOption;
+        }
 
-    if (privateOption === undefined) {
-        privateMode.checked = true;
-        await setPrivateOption(true);
-    } else {
-        privateMode.checked = privateOption;
+        // Initial passwordOption
+        const passwordOptionValue = await getPasswordOption();
+        if (passwordOptionValue) {
+            chkPasswordOption.checked = passwordOptionValue;
+        } else if (passwordOptionValue === undefined) {
+            const passwordValue = await getPassword();
+
+            if (passwordValue) {
+                chkPasswordOption.checked = true;
+            }
+        }
+
     }
 
-    privateMode.addEventListener('change', async () => {
-        await setPrivateOption(privateMode.checked);
-    });
-
-    addCurrentTabButton.addEventListener('click', async () => {
+    btnAddCurrentTab.addEventListener('click', async () => {
         // Get the currently active tab
         const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
         if (tabs.length <= 0) {
@@ -122,34 +138,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    urlInput.addEventListener('keydown', (event) => {
+    chkPrivate.addEventListener('change', async () => {
+        await setPrivateOption(chkPrivate.checked);
+    });
+
+    InputURL.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             addInputBlackList();
         }
     });
 
-    addButton.addEventListener('click', async () => {
+    btnAdd.addEventListener('click', async () => {
         addInputBlackList();
     });
 
-    // Check if the password was set
-    const password = await getPassword();
-    if (password) {
-        // verify password
-        verifyPasswordForm.removeAttribute('hidden');
-        verifyInput.focus();
-    } else {
-        // set password
-        passwordForm.removeAttribute('hidden');
-        newPasswordInput.focus();
-    }
-
-    setPasswordButton.addEventListener('click', async () => {
-        const newPassword = newPasswordInput.value;
+    btnSetPassword.addEventListener('click', async () => {
+        const newPassword = inputNewPassword.value;
         if (newPassword) {
             await setPassword(newPassword);
-            verifyPasswordForm.removeAttribute('hidden', '');
-            passwordForm.setAttribute('hidden', '');
+            formVerifyPassword.removeAttribute('hidden', '');
+            formPassword.setAttribute('hidden', '');
 
             alert(chrome.i18n.getMessage("info_set_password_success"));
         } else {
@@ -157,16 +165,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    verifyButton.addEventListener('click', () => {
+    btnVerify.addEventListener('click', () => {
         verifyPassword();
     });
 
-    verifyInput.addEventListener('keydown', (event) => {
+    inputVerify.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             verifyPassword();
         }
     });
 
+    chkPasswordOption.addEventListener("change", async () => {
+        await setPasswordOption(chkPasswordOption.checked);
+
+    })
+
+    // Clear password
+    btnClearPassword.addEventListener("click", async () => {
+        await setPassword("");
+        alert(chrome.i18n.getMessage("info_verify_password"));
+    })
+
+    OptionInit();
+
+    const passwordValue = await getPassword();
+    const passwordOptionValue = await getPasswordOption();
+
+    console.log(passwordValue.length, passwordOptionValue);
+
+    if (passwordOptionValue) {
+        if (passwordValue.length == 0) {
+            // Set password
+            formPassword.removeAttribute("hidden");
+            inputNewPassword.focus();
+        } else {
+            formVerifyPassword.removeAttribute("hidden");
+            inputVerify.focus();
+        }
+    } else {
+        formSetting.removeAttribute("hidden");
+    }
+
     displayBlacklist();
 });
-
