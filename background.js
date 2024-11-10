@@ -53,7 +53,7 @@ const removeHistory = async (url) => {
 
         // Clear url history of curr
         await chrome.history.deleteUrl({ url: url });
-        console.log("History removed: ", url)
+        console.log("History removed: ", url);
     } catch (e) {
         console.log("removeHistory: ", e);
     }

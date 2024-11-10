@@ -15,7 +15,7 @@ const localizeHtmlPage = () => {
             obj.innerHTML = valNewH;
         }
     }
-}
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
     localizeHtmlPage();
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-    }
+    };
 
     btnAddCurrentTab.addEventListener('click', async () => {
         // Get the currently active tab
@@ -178,13 +178,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     chkPasswordOption.addEventListener("change", async () => {
         await setPasswordOption(chkPasswordOption.checked);
 
-    })
+    });
 
     // Clear password
     btnClearPassword.addEventListener("click", async () => {
         await setPassword("");
         alert(chrome.i18n.getMessage("info_verify_password"));
-    })
+    });
 
     OptionInit();
 
