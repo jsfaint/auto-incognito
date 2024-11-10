@@ -46,5 +46,14 @@
     },
     "info_set_password_hint": {
         "message": "Please input new password!"
+    },
+    "label_password_option": {
+        "message": "Enable Password"
+    },
+    "button_clear_password": {
+        "message": "Clear Password"
+    },
+    "info_clear_password": {
+        "message": "Password was cleared"
     }
 }

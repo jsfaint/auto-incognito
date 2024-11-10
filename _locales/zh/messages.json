@@ -46,5 +46,14 @@
     },
     "info_set_password_hint": {
         "message": "请输入新密码！"
+    },
+    "label_password_option": {
+        "message": "启用密码"
+    },
+    "button_clear_password": {
+        "message": "清除密码"
+    },
+    "info_clear_password": {
+        "message": "密码已清除"
     }
 }
