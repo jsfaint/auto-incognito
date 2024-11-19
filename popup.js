@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const privateOption = await getPrivateOption();
         if (privateOption === undefined) {
             chkPrivate.checked = true;
+            setPrivateOption(true);
         } else {
             chkPrivate.checked = privateOption;
         }
@@ -101,6 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const passwordOptionValue = await getPasswordOption();
         if (passwordOptionValue) {
             chkPasswordOption.checked = passwordOptionValue;
+            setPasswordOption(chkPasswordOption.checked)
         } else if (passwordOptionValue === undefined) {
             const passwordValue = await getPassword();
 
@@ -186,12 +188,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert(chrome.i18n.getMessage("info_verify_password"));
     });
 
-    OptionInit();
+    await OptionInit();
 
     const passwordValue = await getPassword();
     const passwordOptionValue = await getPasswordOption();
-
-    console.log(passwordValue.length, passwordOptionValue);
 
     if (passwordOptionValue) {
         if (passwordValue.length == 0) {
