@@ -100,17 +100,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Initial passwordOption
         const passwordOptionValue = await getPasswordOption();
-        if (passwordOptionValue) {
-            chkPasswordOption.checked = passwordOptionValue;
-            setPasswordOption(chkPasswordOption.checked)
-        } else if (passwordOptionValue === undefined) {
+        if (passwordOptionValue === undefined) {
             const passwordValue = await getPassword();
 
             if (passwordValue) {
                 chkPasswordOption.checked = true;
+            } else {
+                chkPasswordOption.checked = false;
             }
-        }
 
+            setPasswordOption(chkPasswordOption.checked)
+        } else {
+            chkPasswordOption.checked = passwordOptionValue;
+        }
     };
 
     btnAddCurrentTab.addEventListener('click', async () => {
@@ -179,13 +181,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     chkPasswordOption.addEventListener("change", async () => {
         await setPasswordOption(chkPasswordOption.checked);
-
+        window.location.reload();
     });
 
     // Clear password
     btnClearPassword.addEventListener("click", async () => {
         await setPassword("");
-        alert(chrome.i18n.getMessage("info_verify_password"));
+        alert(chrome.i18n.getMessage("info_clear_password"));
     });
 
     await OptionInit();
