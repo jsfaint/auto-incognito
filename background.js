@@ -6,7 +6,7 @@ try {
     console.error(e);
 }
 
-chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
+const privateModeHandler = async (details) => {
     // if private option was disabled, skip it.
     const privateOption = await getPrivateOption();
     if (!privateOption) {
@@ -35,7 +35,9 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     await chrome.tabs.remove(details.tabId);
     // Clear url history
     await chrome.history.deleteUrl({ url: url });
-}, { url: [{ urlMatches: '.*' }] });
+}
+
+chrome.webNavigation.onBeforeNavigate.addListener(privateModeHandler, { url: [{ urlMatches: '.*' }] });
 
 // Clear url history
 const removeHistory = async (url) => {
@@ -59,16 +61,21 @@ const removeHistory = async (url) => {
     }
 };
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+const normalModeHandler = async (tabId, changeInfo, tab) => {
     try {
         if (changeInfo.url === undefined) {
             return;
         }
 
-        chrome.tabs.onRemoved.addListener(async () => {
-            removeHistory(changeInfo.url);
+        const url = changeInfo.url;
+        chrome.tabs.onRemoved.addListener(async (removedTabId) => {
+            if (removedTabId === tabId) {
+                await removeHistory(url);
+            }
         });
     } catch (e) {
-        console.log("onUpdate: ", e);
+        console.error("Error in tab update handler:", e);
     }
-});
+};
+
+chrome.tabs.onUpdated.addListener(normalModeHandler);
