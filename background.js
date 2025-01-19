@@ -37,7 +37,7 @@ const privateModeHandler = async (details) => {
     await chrome.history.deleteUrl({ url: url });
 }
 
-chrome.webNavigation.onBeforeNavigate.addListener(privateModeHandler, { url: [{ urlMatches: '.*' }] });
+chrome.webNavigation.onBeforeNavigate.addListener(privateModeHandler);
 
 // Clear url history
 const removeHistory = async (url) => {
