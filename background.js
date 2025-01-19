@@ -35,7 +35,7 @@ const privateModeHandler = async (details) => {
     await chrome.tabs.remove(details.tabId);
     // Clear url history
     await chrome.history.deleteUrl({ url: url });
-}
+};
 
 chrome.webNavigation.onBeforeNavigate.addListener(privateModeHandler);
 
