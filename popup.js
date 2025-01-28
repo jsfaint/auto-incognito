@@ -40,6 +40,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const formSetting = document.getElementById('setting-form');
     const btnClearPassword = document.getElementById('clear-password');
 
+    const btnExport = document.getElementById('exportButton');
+    const btnImport = document.getElementById('importButton');
+
     const displayBlacklist = async () => {
         const blacklist = await getBlacklist();
         const blacklistElement = document.getElementById('blacklist');
@@ -190,6 +193,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert(chrome.i18n.getMessage("info_clear_password"));
     });
 
+
+
+    const exportBlacklist = async () => {
+        const blacklist = await getBlacklist();
+        const blob = new Blob([blacklist.join('\n')], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'blacklist.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    btnExport.addEventListener("click", exportBlacklist);
+
+    const importBlacklist = async (file) => {
+        const text = await file.text();
+        const lines = text.split('\n').filter(line => line.trim());
+        const whitelistFiltered = lines.filter(url => !findInWhitelist(url));
+
+        const currentBlacklist = await getBlacklist();
+        const newBlacklist = [...new Set([...currentBlacklist, ...whitelistFiltered])];
+
+        await setBlacklist(newBlacklist);
+        displayBlacklist();
+        alert(chrome.i18n.getMessage("alert_import_success", [whitelistFiltered.length]));
+        console.log(newBlacklist);
+        console.log(whitelistFiltered);
+    };
+
+    btnImport.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.txt';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file?.type === 'text/plain') {
+                importBlacklist(file);
+            } else {
+                alert(chrome.i18n.getMessage("alert_invalid_file"));
+            }
+        };
+        input.click();
+    });
+
+    // Start from here
     await OptionInit();
 
     const passwordValue = await getPassword();
