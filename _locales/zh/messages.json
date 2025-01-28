@@ -55,5 +55,17 @@
     },
     "info_clear_password": {
         "message": "密码已清除"
+    },
+    "button_import": {
+        "message": "导入黑名单"
+    },
+    "button_export": {
+        "message": "导出黑名单"
+    },
+    "alert_import_success": {
+        "message": "成功导入$1条记录"
+    },
+    "alert_invalid_file": {
+        "message": "文件格式无效"
     }
 }

@@ -55,5 +55,17 @@
     },
     "info_clear_password": {
         "message": "Password was cleared"
+    },
+    "button_import": {
+        "message": "Import Blacklist"
+    },
+    "button_export": {
+        "message": "Export Blacklist"
+    },
+    "alert_import_success": {
+        "message": "Successfully imported $1 records"
+    },
+    "alert_invalid_file": {
+        "message": "Invalid file format"
     }
 }
