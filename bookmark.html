@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>从收藏夹导入</title>
+    <style>
+        body {
+            min-width: 400px;
+            min-height: 500px;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .bookmark-tree {
+            height: 70vh;
+            overflow-y: auto;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #eee;
+        }
+        .bookmark-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            margin: 2px 0;
+        }
+        .bookmark-item label {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        .dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 8px 20px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: #f0f0f0;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #e0e0e0;
+        }
+        .toggle {
+            transition: transform 0.2s;
+        }
+        .children {
+            margin-left: 20px;
+        }
+        input[type="checkbox"]:indeterminate {
+            background: #999;
+            border-color: #999;
+            position: relative;
+        }
+        input[type="checkbox"]:indeterminate::before {
+            content: "";
+            position: absolute;
+            width: 60%;
+            height: 2px;
+            background: white;
+            top: 50%;
+            left: 20%;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body>
+    <h3 id="dialogTitle"></h3>
+    <div class="bookmark-tree" id="bookmarkTree"></div>
+    <div class="dialog-buttons">
+        <button id="cancelImport">取消</button>
+        <button id="confirmImport">导入</button>
+    </div>
+    <script src="lib/blacklist.js"></script>
+    <script src="lib/whitelist.js"></script>
+    <script src="bookmark.js"></script>
+</body>
+</html> 

@@ -67,5 +67,23 @@
     },
     "alert_invalid_file": {
         "message": "文件格式无效"
+    },
+    "button_import_bookmark": {
+        "message": "从收藏夹导入"
+    },
+    "dialog_select_folder": {
+        "message": "请选择要导入的收藏夹文件夹"
+    },
+    "alert_import_bookmark_success": {
+        "message": "成功从收藏夹导入$1条记录"
+    },
+    "button_cancel": {
+        "message": "取消"
+    },
+    "root_folder": {
+        "message": "根目录"
+    },
+    "alert_no_new_records": {
+        "message": "没有发现新的可导入记录"
     }
 }
