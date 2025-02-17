@@ -82,5 +82,8 @@
     },
     "root_folder": {
         "message": "Root Folder"
+    },
+    "alert_no_new_records": {
+        "message": "No new records found to import"
     }
 }

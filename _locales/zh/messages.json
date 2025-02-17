@@ -82,5 +82,8 @@
     },
     "root_folder": {
         "message": "根目录"
+    },
+    "alert_no_new_records": {
+        "message": "没有发现新的可导入记录"
     }
 }

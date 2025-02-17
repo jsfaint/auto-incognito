@@ -49,6 +49,21 @@
         .children {
             margin-left: 20px;
         }
+        input[type="checkbox"]:indeterminate {
+            background: #999;
+            border-color: #999;
+            position: relative;
+        }
+        input[type="checkbox"]:indeterminate::before {
+            content: "";
+            position: absolute;
+            width: 60%;
+            height: 2px;
+            background: white;
+            top: 50%;
+            left: 20%;
+            transform: translateY(-50%);
+        }
     </style>
 </head>
 <body>
