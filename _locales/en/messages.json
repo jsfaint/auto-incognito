@@ -67,5 +67,14 @@
     },
     "alert_invalid_file": {
         "message": "Invalid file format"
+    },
+    "button_import_bookmark": {
+        "message": "Import from Bookmarks"
+    },
+    "dialog_select_folder": {
+        "message": "Please select a bookmark folder"
+    },
+    "alert_import_bookmark_success": {
+        "message": "Successfully imported $1 records from bookmarks"
     }
 }

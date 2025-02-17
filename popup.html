@@ -5,6 +5,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .button-group button {
+            flex: 1;
+            white-space: nowrap;
+        }
+    </style>
 </head>
 
 <body>
@@ -54,8 +65,11 @@
         <div>__MSG_label_blacklist__</div>
         <ul id="blacklist"></ul>
 
-        <button id="importButton">__MSG_button_import__</button>
-        <button id="exportButton">__MSG_button_export__</button>
+        <div class="button-group">
+            <button id="importButton">__MSG_button_import__</button>
+            <button id="importBookmarkButton">__MSG_button_import_bookmark__</button>
+            <button id="exportButton">__MSG_button_export__</button>
+        </div>
     </section>
 </body>
 
