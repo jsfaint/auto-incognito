@@ -76,5 +76,11 @@
     },
     "alert_import_bookmark_success": {
         "message": "Successfully imported $1 records from bookmarks"
+    },
+    "button_cancel": {
+        "message": "Cancel"
+    },
+    "root_folder": {
+        "message": "Root Folder"
     }
 }

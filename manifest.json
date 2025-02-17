@@ -22,5 +22,9 @@
         "16": "icon.png",
         "48": "icon.png",
         "128": "icon.png"
-    }
+    },
+    "web_accessible_resources": [{
+        "resources": ["bookmark.html"],
+        "matches": ["<all_urls>"]
+    }]
 }

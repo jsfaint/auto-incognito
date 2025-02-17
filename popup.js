@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // 从收藏夹导入URL到黑名单
-    const importFromBookmarks = async (bookmarkNode) => {
+    const importFromBookmarks = async (selectedNodes) => {
         let count = 0;
         const blacklist = await getBlacklist();
         
@@ -274,59 +274,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         };
 
-        processNode(bookmarkNode);
+        // 处理所有选中的节点
+        selectedNodes.forEach(processNode);
         
         if (count > 0) {
             await setBlacklist(blacklist);
             alert(chrome.i18n.getMessage("alert_import_bookmark_success", [count.toString()]));
             displayBlacklist();
         }
+        return count;
     };
 
-    btnImportBookmark.addEventListener('click', async () => {
-        try {
-            // 打开书签选择器
-            const bookmarkTree = await chrome.bookmarks.getTree();
-            // 创建书签选择对话框
-            const dialog = document.createElement('dialog');
-            dialog.innerHTML = `
-                <h3>${chrome.i18n.getMessage("dialog_select_folder")}</h3>
-                <div id="bookmark-tree"></div>
-            `;
-            document.body.appendChild(dialog);
-            
-            const renderBookmarkTree = (node, container, level = 0) => {
-                const div = document.createElement('div');
-                div.style.marginLeft = `${level * 20}px`;
-                
-                if (node.children) {
-                    const btn = document.createElement('button');
-                    btn.textContent = node.title || "根目录";
-                    btn.onclick = async () => {
-                        await importFromBookmarks(node);
-                        dialog.close();
-                    };
-                    div.appendChild(btn);
-                }
-                
-                container.appendChild(div);
-                
-                if (node.children) {
-                    node.children.forEach(child => {
-                        if (child.children) { // 只显示文件夹
-                            renderBookmarkTree(child, container, level + 1);
-                        }
-                    });
-                }
-            };
-            
-            const treeContainer = dialog.querySelector('#bookmark-tree');
-            bookmarkTree.forEach(node => renderBookmarkTree(node, treeContainer));
-            
-            dialog.showModal();
-        } catch (e) {
-            console.error("Error importing bookmarks:", e);
-        }
+    btnImportBookmark.addEventListener('click', () => {
+        chrome.tabs.create({
+            url: chrome.runtime.getURL('bookmark.html')
+        });
     });
 
     // Start from here

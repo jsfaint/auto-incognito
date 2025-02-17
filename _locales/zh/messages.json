@@ -76,5 +76,11 @@
     },
     "alert_import_bookmark_success": {
         "message": "成功从收藏夹导入$1条记录"
+    },
+    "button_cancel": {
+        "message": "取消"
+    },
+    "root_folder": {
+        "message": "根目录"
     }
 }
