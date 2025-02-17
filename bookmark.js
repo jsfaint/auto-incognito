@@ -89,7 +89,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.getElementById('cancelImport').addEventListener('click', () => {
-        window.location.href = 'about:blank';
+        chrome.tabs.getCurrent(tab => {
+            if (tab) chrome.tabs.remove(tab.id);
+        });
     });
 
     document.getElementById('confirmImport').addEventListener('click', async () => {
@@ -101,7 +103,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } else {
                     alert(chrome.i18n.getMessage("alert_no_new_records"));
                 }
-                window.location.href = 'about:blank';
+                chrome.tabs.getCurrent(tab => {
+                    if (tab) chrome.tabs.remove(tab.id);
+                });
             } catch (e) {
                 console.error("Import failed:", e);
                 alert("导入过程中发生错误");
