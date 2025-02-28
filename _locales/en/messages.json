@@ -21,7 +21,7 @@
         "message": "Verify Password"
     },
     "label_blacklist_management": {
-        "message": "Blacklist Management"
+        "message": "Add to Blacklist"
     },
     "label_private_mode": {
         "message": "Enter private mode"
@@ -97,5 +97,8 @@
     },
     "option_new_window": {
         "message": "New window"
+    },
+    "label_setting": {
+        "message": "Setting"
     }
 }

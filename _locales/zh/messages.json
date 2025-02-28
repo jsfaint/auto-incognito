@@ -21,7 +21,7 @@
         "message": "验证密码"
     },
     "label_blacklist_management": {
-        "message": "黑名单管理"
+        "message": "添加黑名单"
     },
     "label_private_mode": {
         "message": "是否进入隐私模式"
@@ -97,5 +97,8 @@
     },
     "option_new_window": {
         "message": "新窗口"
+    },
+    "label_setting": {
+        "message": "设置"
     }
 }
