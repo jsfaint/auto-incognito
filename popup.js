@@ -118,6 +118,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             chkPasswordOption.checked = passwordOptionValue;
         }
+
+        const windowStateSelect = document.getElementById('window-state');
+
+        // 初始化窗口状态
+        const windowState = await getWindowState();
+        windowStateSelect.value = windowState || 'maximized';
+
+        // 添加事件监听
+        windowStateSelect.addEventListener('change', async () => {
+            await setWindowState(windowStateSelect.value);
+        });
     };
 
     btnAddCurrentTab.addEventListener('click', async () => {
@@ -312,3 +323,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     displayBlacklist();
 });
+
+const getWindowState = async () => {
+    const data = await chrome.storage.sync.get(['windowState']);
+    return data.windowState;
+};
+
+const setWindowState = async (state) => await chrome.storage.sync.set({ windowState: state });
