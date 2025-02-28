@@ -97,5 +97,8 @@
     },
     "option_new_window": {
         "message": "新窗口"
+    },
+    "label_setting": {
+        "message": "设置"
     }
 }

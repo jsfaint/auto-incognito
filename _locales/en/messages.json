@@ -97,5 +97,8 @@
     },
     "option_new_window": {
         "message": "New window"
+    },
+    "label_setting": {
+        "message": "Setting"
     }
 }
