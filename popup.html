@@ -139,7 +139,7 @@
             border: 1px solid var(--border-color);
             border-radius: 4px;
             background-color: white;
-            font-size: 14px;
+            font-size: 15px;
             cursor: pointer;
         }
 
@@ -155,10 +155,24 @@
             cursor: pointer;
         }
 
+        label {
+            font-size: 15px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
         #password-option-form {
             display: flex;
             align-items: center;
             gap: 15px;
+            font-size: 15px;
+        }
+
+        .bookmark-item label {
+            margin-left: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
         }
 
         .bookmark-dialog {
@@ -203,12 +217,6 @@
 
         .bookmark-item:hover {
             background-color: rgba(74, 144, 226, 0.1);
-        }
-
-        .bookmark-item label {
-            margin-left: 8px;
-            cursor: pointer;
-            font-size: 14px;
         }
 
         .dialog-buttons {
@@ -268,7 +276,7 @@
         <h1>__MSG_label_setting__</h1>
         <div id="password-option-form">
             <input type="checkbox" id="password-option">
-            __MSG_label_password_option__
+            <label>__MSG_label_password_option__</label>
             <button id="clear-password">__MSG_button_clear_password__</button>
         </div>
 
@@ -277,7 +285,7 @@
 
         <div>
             <input type="checkbox" id="in-private-mode">
-            __MSG_label_private_mode__
+            <label>__MSG_label_private_mode__</label>
         </div>
 
         <div>
@@ -292,7 +300,7 @@
         <hr>
         </hr>
 
-        <div>__MSG_label_blacklist__</div>
+        <div><label>__MSG_label_blacklist__</label></div>
         <ul id="blacklist"></ul>
 
         <div class="button-group">
