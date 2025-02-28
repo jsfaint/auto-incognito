@@ -85,5 +85,17 @@
     },
     "alert_no_new_records": {
         "message": "没有发现新的可导入记录"
+    },
+    "label_window_state": {
+        "message": "窗口状态"
+    },
+    "option_maximized": {
+        "message": "最大化"
+    },
+    "option_minimized": {
+        "message": "最小化"
+    },
+    "option_new_window": {
+        "message": "新窗口"
     }
 }

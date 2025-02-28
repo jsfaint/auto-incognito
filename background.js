@@ -31,7 +31,8 @@ const privateModeHandler = async (details) => {
         // Create a new private window
         await chrome.windows.create({
             url: url,
-            incognito: true
+            incognito: true,
+            state: await getWindowState() || 'maximized'
         });
     } catch (e) {
         console.error("Error in tab update handler:", e);
@@ -66,3 +67,8 @@ const normalModeHandler = async (tabId, changeInfo, tab) => {
 };
 
 chrome.tabs.onUpdated.addListener(normalModeHandler);
+
+const getWindowState = async () => {
+    const data = await chrome.storage.sync.get(['windowState']);
+    return data.windowState;
+};

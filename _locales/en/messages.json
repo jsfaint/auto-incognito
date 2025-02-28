@@ -85,5 +85,17 @@
     },
     "alert_no_new_records": {
         "message": "No new records found to import"
+    },
+    "label_window_state": {
+        "message": "Window state"
+    },
+    "option_maximized": {
+        "message": "Maximized"
+    },
+    "option_minimized": {
+        "message": "Minimized"
+    },
+    "option_new_window": {
+        "message": "New window"
     }
 }
