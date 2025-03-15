@@ -3,7 +3,7 @@
 try {
     importScripts('lib/blacklist.js', 'lib/private.js');
 } catch (e) {
-    console.error(e);
+    console.log(e);
 }
 
 const privateModeHandler = async (details) => {
@@ -35,7 +35,7 @@ const privateModeHandler = async (details) => {
             state: await getWindowState() || 'maximized'
         });
     } catch (e) {
-        console.error("Error in tab update handler:", e);
+        console.log("Error in tab update handler:", e);
     }
 };
 
@@ -62,7 +62,7 @@ const normalModeHandler = async (tabId, changeInfo, tab) => {
 
         chrome.tabs.onRemoved.addListener(removeHistoryListener);
     } catch (e) {
-        console.error("Error in tab update handler:", e);
+        console.log("Error in tab update handler:", e);
     }
 };
 
