@@ -154,4 +154,4 @@ describe('Background Script', () => {
             expect(state).toBeUndefined();
         });
     });
-}); 
+});

@@ -90,4 +90,4 @@ describe('Password Functions', () => {
             expect(chrome.storage.sync.set).toHaveBeenCalledWith({ passwordOption: false });
         });
     });
-}); 
+});

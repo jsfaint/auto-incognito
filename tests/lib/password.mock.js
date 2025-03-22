@@ -31,4 +31,4 @@ const setPasswordOption = async (passwordOption) => {
     });
 };
 
-module.exports = { getPassword, setPassword, getPasswordOption, setPasswordOption }; 
+module.exports = { getPassword, setPassword, getPasswordOption, setPasswordOption };

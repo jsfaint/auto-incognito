@@ -98,4 +98,4 @@ const BlackList = {
     }
 };
 
-module.exports = { BlackList }; 
+module.exports = { BlackList };

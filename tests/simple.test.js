@@ -67,4 +67,4 @@ describe('Storage API Functions', () => {
         chrome.storage.sync.set({ password: 'test123' }, () => { });
         expect(chrome.storage.sync.set).toHaveBeenCalledWith({ password: 'test123' }, expect.any(Function));
     });
-}); 
+});

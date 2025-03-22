@@ -95,4 +95,4 @@ describe('BlackList Module', () => {
         const result2 = await BlackList.check('https://other-site.com/page');
         expect(result2).toBe(false);
     });
-}); 
+});

@@ -15,4 +15,4 @@ const setPrivateOption = async (privateOption) => {
     });
 };
 
-module.exports = { getPrivateOption, setPrivateOption }; 
+module.exports = { getPrivateOption, setPrivateOption };

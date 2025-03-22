@@ -65,4 +65,4 @@ const getWindowState = async () => {
     });
 };
 
-module.exports = { privateModeHandler, normalModeHandler, getWindowState }; 
+module.exports = { privateModeHandler, normalModeHandler, getWindowState };

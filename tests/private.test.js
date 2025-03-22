@@ -60,4 +60,4 @@ describe('Private Mode Functions', () => {
             expect(chrome.storage.sync.set).toHaveBeenCalledWith({ private: false });
         });
     });
-}); 
+});

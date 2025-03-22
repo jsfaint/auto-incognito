@@ -56,4 +56,4 @@ global.URL = function (url) {
     } catch (e) {
         return { hostname: '' };
     }
-}; 
+};

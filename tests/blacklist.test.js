@@ -150,4 +150,4 @@ describe('BlackList', () => {
             expect(chrome.storage.local.set).not.toHaveBeenCalled();
         });
     });
-}); 
+});
