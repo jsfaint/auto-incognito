@@ -47,12 +47,12 @@
             padding: 15px;
             background: var(--secondary-color);
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
 
         section:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         input[type="text"],
@@ -131,7 +131,7 @@
             margin: 5px 0;
             background: white;
             border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         select {
@@ -188,7 +188,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
 
         .bookmark-dialog::backdrop {
@@ -233,8 +233,15 @@
 
         /* 添加动画效果 */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         section {
@@ -301,7 +308,9 @@
         </hr>
 
         <div><label>__MSG_label_blacklist__</label></div>
-        <ul id="blacklist"></ul>
+        <div class="button-group">
+            <button id="manageBlacklistButton">__MSG_button_manage_blacklist__</button>
+        </div>
 
         <div class="button-group">
             <button id="importButton">__MSG_button_import__</button>

@@ -11,6 +11,9 @@
         "webNavigation",
         "bookmarks"
     ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
     "background": {
         "service_worker": "background.js"
     },
@@ -23,8 +26,18 @@
         "48": "icon.png",
         "128": "icon.png"
     },
-    "web_accessible_resources": [{
-        "resources": ["bookmark.html"],
-        "matches": ["<all_urls>"]
-    }]
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "bookmark.html"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "options_ui": {
+        "page": "blacklist-manager.html",
+        "open_in_tab": true
+    }
 }

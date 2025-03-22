@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>__MSG_blacklist_manager_title__</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f6fa;
+            --text-color: #2c3e50;
+            --border-color: #e1e8ed;
+            --hover-color: #357abd;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--text-color);
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: 1.8em;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            margin-bottom: 1em;
+            color: var(--primary-color);
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-1px);
+        }
+
+        .button-danger {
+            background-color: var(--danger-color);
+        }
+
+        .button-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .button-group button {
+            flex: 1;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        #blacklist-container {
+            margin-top: 20px;
+        }
+
+        #blacklist-selection-tools {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        #blacklist {
+            list-style: none;
+            margin: 10px 0;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        #blacklist li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+        }
+
+        #blacklist li:last-child {
+            border-bottom: none;
+        }
+
+        #blacklist li:hover {
+            background-color: rgba(74, 144, 226, 0.05);
+        }
+
+        .blacklist-item-checkbox {
+            margin-right: 15px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .blacklist-item-content {
+            flex-grow: 1;
+            word-break: break-all;
+        }
+
+        .back-button {
+            padding: 8px 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .empty-list {
+            padding: 30px;
+            text-align: center;
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        .actions-bar {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .status.success {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--success-color);
+        }
+
+        .status.error {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 13px;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <!-- 添加内联脚本以确保 BlackList 对象存在 -->
+    <script>
+        // 确保 BlackList 对象即使在原始脚本加载失败的情况下也能存在
+        if (typeof BlackList === 'undefined') {
+            // 创建本地存储适配器
+            window.BlackList = {
+                // 获取所有黑名单项
+                getAll: async function () {
+                    return new Promise((resolve) => {
+                        chrome.storage.local.get(['blacklist'], function (result) {
+                            resolve(result.blacklist || []);
+                        });
+                    });
+                },
+
+                // 添加项目到黑名单
+                add: async function (url) {
+                    return new Promise((resolve) => {
+                        this.getAll().then(blacklist => {
+                            if (!blacklist.includes(url)) {
+                                blacklist.push(url);
+                                chrome.storage.local.set({ blacklist: blacklist }, function () {
+                                    resolve(true);
+                                });
+                            } else {
+                                resolve(false);
+                            }
+                        });
+                    });
+                },
+
+                // 从黑名单中移除项目
+                remove: async function (url) {
+                    return new Promise((resolve) => {
+                        this.getAll().then(blacklist => {
+                            const index = blacklist.indexOf(url);
+                            if (index !== -1) {
+                                blacklist.splice(index, 1);
+                                chrome.storage.local.set({ blacklist: blacklist }, function () {
+                                    resolve(true);
+                                });
+                            } else {
+                                resolve(false);
+                            }
+                        });
+                    });
+                },
+
+                // 检查URL是否在黑名单中
+                check: async function (url) {
+                    return new Promise((resolve) => {
+                        this.getAll().then(blacklist => {
+                            for (const pattern of blacklist) {
+                                if (url.includes(pattern)) {
+                                    resolve(true);
+                                    return;
+                                }
+                            }
+                            resolve(false);
+                        });
+                    });
+                }
+            };
+            console.log('已创建 BlackList 适配器对象');
+        }
+    </script>
+
+    <!-- 然后尝试加载原始库文件 -->
+    <script src="lib/blacklist.js"></script>
+    <script src="lib/whitelist.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1 class="page-title">__MSG_label_blacklist_management__</h1>
+            <button id="backButton" class="back-button">← __MSG_button_back__</button>
+        </header>
+
+        <div class="actions-bar">
+            <div class="action-buttons">
+                <button id="selectAllButton">__MSG_button_select_all__</button>
+                <button id="deselectAllButton">__MSG_button_deselect_all__</button>
+            </div>
+            <button id="deleteSelectedButton" class="button-danger">__MSG_button_delete_selected__</button>
+        </div>
+
+        <div class="two-columns">
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">__MSG_label_add_blacklist__</div>
+                    </div>
+                    <input type="text" id="urlInput" placeholder="__MSG_placeholder_blacklist__">
+                    <button id="addButton">__MSG_button_add_blacklist__</button>
+                    <div id="statusMessage" class="status" style="display: none;"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">__MSG_label_import_export__</div>
+                    </div>
+                    <div class="button-group">
+                        <button id="importButton">__MSG_button_import__</button>
+                        <button id="importBookmarkButton">__MSG_button_import_bookmark__</button>
+                        <button id="exportButton">__MSG_button_export__</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">__MSG_label_blacklist__</div>
+                    <span id="blacklist-count">0 __MSG_label_items__</span>
+                </div>
+                <ul id="blacklist"></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Auto Private Mode - __MSG_label_version__ 0.7.0</p>
+        </footer>
+    </div>
+
+    <!-- 确保JS在DOM加载完成后加载 -->
+    <script src="blacklist-manager.js"></script>
+</body>
+
+</html>

@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const importFromBookmarks = async (selectedNodes) => {
         let count = 0;
         const blacklist = await getBlacklist();
-        
+
         // 递归处理书签文件夹
         const processNode = (node) => {
             if (node.url) {
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 处理所有选中的节点
         selectedNodes.forEach(processNode);
-        
+
         if (count > 0) {
             await setBlacklist(blacklist);
             alert(chrome.i18n.getMessage("alert_import_bookmark_success", [count.toString()]));
@@ -322,6 +322,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     displayBlacklist();
+
+    // 添加管理黑名单按钮的点击事件
+    document.getElementById('manageBlacklistButton').addEventListener('click', () => {
+        chrome.runtime.openOptionsPage();
+    });
 });
 
 const getWindowState = async () => {
