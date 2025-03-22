@@ -46,6 +46,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnImportBookmark = document.getElementById('importBookmarkButton');
     const btnManageBlacklist = document.getElementById('manageBlacklistButton');
 
+    // 状态消息显示
+    const showStatus = (message, type = 'success') => {
+        const statusElem = document.getElementById('statusMessage');
+        if (!statusElem) return;
+
+        statusElem.textContent = message;
+        statusElem.className = `status ${type}`;
+        statusElem.style.display = 'block';
+
+        // 3秒后自动隐藏
+        setTimeout(() => {
+            statusElem.style.display = 'none';
+        }, 3000);
+    };
+
     const verifyPassword = async () => {
         const enteredPassword = inputVerify.value;
 
@@ -70,9 +85,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        if (await addToBlacklist(url)) {
+        if (await BlackList.add(url)) {
             // empty blacklist input
             InputURL.value = "";
+            showStatus(chrome.i18n.getMessage("msg_add_success") || '添加成功');
+        } else {
+            showStatus(chrome.i18n.getMessage("msg_already_exists") || '网址已存在', 'error');
         }
     };
 
@@ -134,7 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const secondLevelDomain = parts.pop();
         const primaryDomain = `${secondLevelDomain}.${tld}`;
 
-        if (await addToBlacklist(primaryDomain)) {
+        if (await BlackList.add(primaryDomain)) {
             chrome.tabs.reload(tabs[0].id);
         }
     });
@@ -188,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     const exportBlacklist = async () => {
-        const blacklist = await getBlacklist();
+        const blacklist = await BlackList.getAll();
         const blob = new Blob([blacklist.join('\n')], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -205,10 +223,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const lines = text.split('\n').filter(line => line.trim());
         const whitelistFiltered = lines.filter(url => !findInWhitelist(url));
 
-        const currentBlacklist = await getBlacklist();
+        const currentBlacklist = await BlackList.getAll();
         const newBlacklist = [...new Set([...currentBlacklist, ...whitelistFiltered])];
 
-        await setBlacklist(newBlacklist);
+        await BlackList.set(newBlacklist);
         alert(chrome.i18n.getMessage("alert_import_success", [whitelistFiltered.length]));
     };
 
@@ -230,7 +248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 从收藏夹导入URL到黑名单
     const importFromBookmarks = async (selectedNodes) => {
         let count = 0;
-        const currentBlacklist = await getBlacklist();
+        const currentBlacklist = await BlackList.getAll();
         const newUrls = [];
 
         // 递归处理书签文件夹
@@ -272,7 +290,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 如果找到新URL，添加到黑名单
         if (newUrls.length > 0) {
             const newBlacklist = [...currentBlacklist, ...newUrls];
-            await setBlacklist(newBlacklist);
+            await BlackList.set(newBlacklist);
             alert(chrome.i18n.getMessage("alert_import_bookmark_success", [count]));
         } else {
             alert(chrome.i18n.getMessage("alert_no_new_records"));

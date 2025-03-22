@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function processBookmarks(selectedNodes) {
     try {
         let count = 0;
-        const blacklist = await getBlacklist();
+        const blacklist = await BlackList.getAll();
         const newDomains = [];
 
         const processNode = (node) => {
@@ -149,7 +149,7 @@ async function processBookmarks(selectedNodes) {
         selectedNodes.forEach(processNode);
 
         if (count > 0) {
-            await setBlacklist([...blacklist, ...newDomains]);
+            await BlackList.set([...blacklist, ...newDomains]);
         }
         return count;
     } catch (e) {

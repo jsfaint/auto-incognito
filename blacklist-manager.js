@@ -1,53 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('黑名单管理页面加载中...');
 
-    // 直接使用 Chrome 存储 API
-    const BlackListDirect = {
-        getAll: () => {
-            return new Promise((resolve) => {
-                chrome.storage.local.get(['blacklist'], function (result) {
-                    resolve(result.blacklist || []);
-                });
-            });
-        },
-
-        add: (url) => {
-            return new Promise((resolve) => {
-                chrome.storage.local.get(['blacklist'], function (result) {
-                    const blacklist = result.blacklist || [];
-                    if (!blacklist.includes(url)) {
-                        blacklist.push(url);
-                        chrome.storage.local.set({ blacklist: blacklist }, function () {
-                            resolve(true);
-                        });
-                    } else {
-                        resolve(false);
-                    }
-                });
-            });
-        },
-
-        remove: (url) => {
-            return new Promise((resolve) => {
-                chrome.storage.local.get(['blacklist'], function (result) {
-                    const blacklist = result.blacklist || [];
-                    const index = blacklist.indexOf(url);
-                    if (index !== -1) {
-                        blacklist.splice(index, 1);
-                        chrome.storage.local.set({ blacklist: blacklist }, function () {
-                            resolve(true);
-                        });
-                    } else {
-                        resolve(false);
-                    }
-                });
-            });
-        }
-    };
-
-    // 使用直接 API 替代 BlackList
-    window.BlackList = BlackListDirect;
-
     // 国际化处理
     const localizeHtmlPage = () => {
         try {
@@ -158,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const added = await window.BlackList.add(url);
+            const added = await BlackList.add(url);
             urlInput.value = '';
 
             if (added) {
@@ -184,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         blacklistElement.innerHTML = '';
 
         try {
-            const blacklist = await window.BlackList.getAll();
+            const blacklist = await BlackList.getAll();
 
             // 更新计数
             if (blacklistCountElement) {
@@ -259,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let successCount = 0;
         for (const url of toDelete) {
             try {
-                if (await window.BlackList.remove(url)) {
+                if (await BlackList.remove(url)) {
                     successCount++;
                 }
             } catch (error) {
@@ -298,7 +251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 let successCount = 0;
                 for (const url of lines) {
-                    if (await window.BlackList.add(url)) {
+                    if (await BlackList.add(url)) {
                         successCount++;
                     }
                 }
@@ -323,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 导出黑名单
     async function exportBlacklist() {
         try {
-            const blacklist = await window.BlackList.getAll();
+            const blacklist = BlackList.getAll();
             const blob = new Blob([blacklist.join('\n')], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
