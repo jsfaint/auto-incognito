@@ -45,22 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const btnImportBookmark = document.getElementById('importBookmarkButton');
 
-    const displayBlacklist = async () => {
-        const blacklist = await getBlacklist();
-        const blacklistElement = document.getElementById('blacklist');
-
-        blacklistElement.innerHTML = '';
-        blacklist.forEach(url => {
-            const li = document.createElement('li');
-            li.textContent = url;
-            li.addEventListener('click', async () => {
-                await removeFromBlacklist(url);
-                displayBlacklist();
-            });
-            blacklistElement.appendChild(li);
-        });
-    };
-
     const verifyPassword = async () => {
         const enteredPassword = inputVerify.value;
 
@@ -88,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (await addToBlacklist(url)) {
             // empty blacklist input
             InputURL.value = "";
-            displayBlacklist();
         }
     };
 
@@ -153,7 +136,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const blacklist = await getBlacklist();
 
         if (await addToBlacklist(primaryDomain)) {
-            displayBlacklist();
             chrome.tabs.reload(tabs[0].id);
         }
     });
@@ -228,7 +210,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const newBlacklist = [...new Set([...currentBlacklist, ...whitelistFiltered])];
 
         await setBlacklist(newBlacklist);
-        displayBlacklist();
         alert(chrome.i18n.getMessage("alert_import_success", [whitelistFiltered.length]));
         console.log(newBlacklist);
         console.log(whitelistFiltered);
@@ -291,7 +272,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (count > 0) {
             await setBlacklist(blacklist);
             alert(chrome.i18n.getMessage("alert_import_bookmark_success", [count.toString()]));
-            displayBlacklist();
         }
         return count;
     };
@@ -320,8 +300,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         formSetting.removeAttribute("hidden");
     }
-
-    displayBlacklist();
 
     // 添加管理黑名单按钮的点击事件
     document.getElementById('manageBlacklistButton').addEventListener('click', () => {
