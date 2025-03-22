@@ -191,42 +191,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 删除选中项
     async function deleteSelected() {
-        const items = document.querySelectorAll('#blacklist li');
-        const toDelete = [];
+        const selectedUrls = Array.from(
+            document.querySelectorAll('#blacklist li .blacklist-item-checkbox:checked')
+        )
+            .map(checkbox =>
+                checkbox.closest('li').querySelector('.blacklist-item-content').textContent
+            );
 
-        items.forEach(item => {
-            const checkbox = item.querySelector('.blacklist-item-checkbox');
-            if (checkbox && checkbox.checked) {
-                const urlSpan = item.querySelector('.blacklist-item-content');
-                if (urlSpan) {
-                    toDelete.push(urlSpan.textContent);
-                }
-            }
-        });
-
-        if (toDelete.length === 0) {
+        if (selectedUrls.length === 0) {
             showStatus(chrome.i18n.getMessage('msg_no_selection') || '请先选择要删除的项', 'error');
             return;
         }
 
-        let successCount = 0;
-        for (const url of toDelete) {
-            try {
-                if (await BlackList.remove(url)) {
-                    successCount++;
-                }
-            } catch (error) {
-                console.error('删除失败:', url, error);
-            }
-        }
+        try {
+            // 使用批量删除功能
+            const successCount = await BlackList.removeBatch(selectedUrls);
 
-        if (successCount > 0) {
-            showStatus(
-                chrome.i18n.getMessage('msg_delete_success').replace('{0}', successCount) ||
-                `成功删除 ${successCount} 项`
-            );
-            await loadBlacklist();
-        } else {
+            if (successCount > 0) {
+                showStatus(
+                    chrome.i18n.getMessage('msg_delete_success').replace('{0}', successCount) ||
+                    `成功删除 ${successCount} 项`
+                );
+                await loadBlacklist();
+            } else {
+                showStatus(chrome.i18n.getMessage('msg_delete_fail') || '删除失败', 'error');
+            }
+        } catch (error) {
+            console.error('批量删除失败:', error);
             showStatus(chrome.i18n.getMessage('msg_delete_fail') || '删除失败', 'error');
         }
     }
@@ -307,4 +298,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         const manifest = chrome.runtime.getManifest();
         versionElement.textContent = manifest.version;
     }
-}); 
+});
