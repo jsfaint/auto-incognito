@@ -1,9 +1,26 @@
 "use strict";
 
 try {
-    importScripts('lib/blacklist.js', 'lib/private.js');
+    importScripts('lib/blacklist.js', 'lib/private.js', 'lib/whitelist.js', 'lib/password.js');
 } catch (e) {
-    console.log(e);
+    console.log("Error importing scripts:", e);
+}
+
+// 查找URL是否在黑名单中
+async function findInBlacklist(url) {
+    if (url == undefined || url == '' || findInWhitelist(url)) {
+        return false;
+    }
+
+    try {
+        const hostname = new URL(url).hostname;
+        const blacklist = await getBlacklist();
+
+        return blacklist.some(pattern => hostname.includes(pattern));
+    } catch (e) {
+        console.log("Error checking blacklist:", e);
+        return false;
+    }
 }
 
 const privateModeHandler = async (details) => {
@@ -72,3 +89,4 @@ const getWindowState = async () => {
     const data = await chrome.storage.sync.get(['windowState']);
     return data.windowState;
 };
+

@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnImport = document.getElementById('importButton');
 
     const btnImportBookmark = document.getElementById('importBookmarkButton');
+    const btnManageBlacklist = document.getElementById('manageBlacklistButton');
 
     const verifyPassword = async () => {
         const enteredPassword = inputVerify.value;
@@ -133,8 +134,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const secondLevelDomain = parts.pop();
         const primaryDomain = `${secondLevelDomain}.${tld}`;
 
-        const blacklist = await getBlacklist();
-
         if (await addToBlacklist(primaryDomain)) {
             chrome.tabs.reload(tabs[0].id);
         }
@@ -211,8 +210,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         await setBlacklist(newBlacklist);
         alert(chrome.i18n.getMessage("alert_import_success", [whitelistFiltered.length]));
-        console.log(newBlacklist);
-        console.log(whitelistFiltered);
     };
 
     btnImport.addEventListener('click', () => {
@@ -233,7 +230,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 从收藏夹导入URL到黑名单
     const importFromBookmarks = async (selectedNodes) => {
         let count = 0;
-        const blacklist = await getBlacklist();
+        const currentBlacklist = await getBlacklist();
+        const newUrls = [];
 
         // 递归处理书签文件夹
         const processNode = (node) => {
@@ -251,29 +249,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const secondLevelDomain = parts.pop();
                     const primaryDomain = `${secondLevelDomain}.${tld}`;
 
-                    // 如果不在黑名单中，则添加
-                    if (!blacklist.includes(primaryDomain)) {
-                        blacklist.push(primaryDomain);
+                    // 只添加不在当前黑名单中的URL
+                    if (primaryDomain && !currentBlacklist.includes(primaryDomain) && !newUrls.includes(primaryDomain)) {
+                        newUrls.push(primaryDomain);
                         count++;
                     }
                 } catch (e) {
-                    console.error("Error processing bookmark URL:", node.url, e);
+                    // 忽略无效URL
+                    console.warn('无法处理的URL:', node.url, e);
                 }
             }
-            // 如果是文件夹，则递归处理
+
+            // 递归处理子文件夹
             if (node.children) {
                 node.children.forEach(processNode);
             }
         };
 
-        // 处理所有选中的节点
-        selectedNodes.forEach(processNode);
+        // 处理选中的节点
+        processNode(selectedNodes);
 
-        if (count > 0) {
-            await setBlacklist(blacklist);
-            alert(chrome.i18n.getMessage("alert_import_bookmark_success", [count.toString()]));
+        // 如果找到新URL，添加到黑名单
+        if (newUrls.length > 0) {
+            const newBlacklist = [...currentBlacklist, ...newUrls];
+            await setBlacklist(newBlacklist);
+            alert(chrome.i18n.getMessage("alert_import_bookmark_success", [count]));
+        } else {
+            alert(chrome.i18n.getMessage("alert_no_new_records"));
         }
-        return count;
     };
 
     btnImportBookmark.addEventListener('click', () => {
@@ -301,10 +304,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         formSetting.removeAttribute("hidden");
     }
 
-    // 添加管理黑名单按钮的点击事件
-    document.getElementById('manageBlacklistButton').addEventListener('click', () => {
-        chrome.runtime.openOptionsPage();
-    });
+    // 添加黑名单管理按钮事件
+    if (btnManageBlacklist) {
+        btnManageBlacklist.addEventListener('click', () => {
+            chrome.tabs.create({ url: 'blacklist-manager.html' });
+        });
+    }
 });
 
 const getWindowState = async () => {

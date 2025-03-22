@@ -1,7 +1,7 @@
 // 确保 BlackList 对象即使在原始脚本加载失败的情况下也能存在
 if (typeof BlackList === 'undefined') {
     // 创建本地存储适配器
-    window.BlackList = {
+    const BlackList = {
         // 获取所有黑名单项
         getAll: async function () {
             return new Promise((resolve) => {
@@ -59,5 +59,25 @@ if (typeof BlackList === 'undefined') {
             });
         }
     };
-    console.log('已创建 BlackList 适配器对象');
+
+    // 导出函数供代码使用
+    async function getBlacklist() {
+        return await BlackList.getAll();
+    }
+
+    async function addToBlacklist(url) {
+        return await BlackList.add(url);
+    }
+
+    async function removeFromBlacklist(url) {
+        return await BlackList.remove(url);
+    }
+
+    async function setBlacklist(blacklist) {
+        return new Promise((resolve) => {
+            chrome.storage.local.set({ blacklist: blacklist }, function () {
+                resolve(true);
+            });
+        });
+    }
 } 

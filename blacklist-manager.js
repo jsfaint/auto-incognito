@@ -256,19 +256,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        try {
-            for (const url of toDelete) {
-                await window.BlackList.remove(url);
+        let successCount = 0;
+        for (const url of toDelete) {
+            try {
+                if (await window.BlackList.remove(url)) {
+                    successCount++;
+                }
+            } catch (error) {
+                console.error('删除失败:', url, error);
             }
+        }
 
+        if (successCount > 0) {
             showStatus(
-                chrome.i18n.getMessage('msg_delete_success')?.replace('{0}', toDelete.length) ||
-                `成功删除 ${toDelete.length} 项`
+                chrome.i18n.getMessage('msg_delete_success').replace('{0}', successCount) ||
+                `成功删除 ${successCount} 项`
             );
-
             await loadBlacklist();
-        } catch (error) {
-            console.error('删除黑名单项失败:', error);
+        } else {
             showStatus(chrome.i18n.getMessage('msg_delete_fail') || '删除失败', 'error');
         }
     }
@@ -277,41 +282,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function importBlacklist() {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.json';
-
+        input.accept = '.txt';
         input.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                try {
-                    const urls = JSON.parse(event.target.result);
-                    if (Array.isArray(urls)) {
-                        let addedCount = 0;
-                        for (const url of urls) {
-                            const added = await window.BlackList.add(url);
-                            if (added) addedCount++;
-                        }
+            try {
+                if (file.type !== 'text/plain') {
+                    showStatus(chrome.i18n.getMessage('msg_invalid_format') || '无效的文件格式', 'error');
+                    return;
+                }
 
-                        showStatus(
-                            chrome.i18n.getMessage('msg_import_success')?.replace('{0}', addedCount) ||
-                            `成功导入 ${addedCount} 项`
-                        );
+                const text = await file.text();
+                const lines = text.split('\n').filter(line => line.trim());
 
-                        await loadBlacklist();
-                    } else {
-                        console.error('导入的JSON不是有效的数组格式');
-                        showStatus(chrome.i18n.getMessage('msg_invalid_format') || '无效的格式', 'error');
+                let successCount = 0;
+                for (const url of lines) {
+                    if (await window.BlackList.add(url)) {
+                        successCount++;
                     }
-                } catch (error) {
-                    console.error('导入黑名单失败:', error);
+                }
+
+                if (successCount > 0) {
+                    showStatus(
+                        chrome.i18n.getMessage('msg_import_success').replace('{0}', successCount) ||
+                        `成功导入 ${successCount} 项`
+                    );
+                    await loadBlacklist();
+                } else {
                     showStatus(chrome.i18n.getMessage('msg_import_fail') || '导入失败', 'error');
                 }
-            };
-            reader.readAsText(file);
+            } catch (error) {
+                console.error('导入文件失败:', error);
+                showStatus(chrome.i18n.getMessage('msg_import_fail') || '导入失败', 'error');
+            }
         };
-
         input.click();
     }
 
@@ -319,24 +324,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function exportBlacklist() {
         try {
             const blacklist = await window.BlackList.getAll();
-
-            if (!blacklist || blacklist.length === 0) {
-                showStatus(chrome.i18n.getMessage('msg_empty_blacklist') || '黑名单为空', 'error');
-                return;
-            }
-
-            const blob = new Blob([JSON.stringify(blacklist, null, 2)], { type: 'application/json' });
+            const blob = new Blob([blacklist.join('\n')], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
-
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'blacklist.json';
+            a.download = 'blacklist.txt';
             a.click();
-
-            setTimeout(() => {
-                URL.revokeObjectURL(url);
-            }, 100);
-
+            URL.revokeObjectURL(url);
             showStatus(chrome.i18n.getMessage('msg_export_success') || '导出成功');
         } catch (error) {
             console.error('导出黑名单失败:', error);
@@ -347,12 +341,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 从书签导入
     async function importBookmark() {
         try {
-            chrome.tabs.create({
-                url: chrome.runtime.getURL('bookmark.html')
-            });
+            chrome.tabs.create({ url: 'bookmark.html' });
         } catch (error) {
-            console.error('打开书签导入页面失败:', error);
+            console.error('打开书签页失败:', error);
             showStatus(chrome.i18n.getMessage('msg_bookmark_fail') || '打开书签页失败', 'error');
         }
+    }
+
+    // 显示版本信息
+    const versionElement = document.getElementById('version');
+    if (versionElement) {
+        const manifest = chrome.runtime.getManifest();
+        versionElement.textContent = manifest.version;
     }
 }); 
