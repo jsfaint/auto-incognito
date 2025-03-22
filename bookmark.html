@@ -1,32 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>从收藏夹导入</title>
+    <link rel="stylesheet" href="css/common.css">
     <style>
-        :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #f5f6fa;
-            --text-color: #2c3e50;
-            --border-color: #e1e8ed;
-            --hover-color: #357abd;
-            --danger-color: #e74c3c;
-            --success-color: #2ecc71;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             min-width: 400px;
             min-height: 500px;
             padding: 25px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            color: var(--text-color);
             background-color: #fff;
             line-height: 1.5;
         }
@@ -46,7 +30,7 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             background: var(--secondary-color);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
             animation: fadeIn 0.3s ease-out;
         }
 
@@ -96,7 +80,7 @@
         button:hover {
             background: var(--hover-color);
             transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         #cancelImport {
@@ -170,8 +154,15 @@
 
         /* 添加动画效果 */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* 自定义滚动条 */
@@ -194,6 +185,7 @@
         }
     </style>
 </head>
+
 <body>
     <h3 id="dialogTitle"></h3>
     <div class="bookmark-tree" id="bookmarkTree"></div>
@@ -205,4 +197,5 @@
     <script src="lib/whitelist.js"></script>
     <script src="bookmark.js"></script>
 </body>
-</html> 
+
+</html>

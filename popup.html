@@ -5,41 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/common.css">
     <style>
-        :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #f5f6fa;
-            --text-color: #2c3e50;
-            --border-color: #e1e8ed;
-            --hover-color: #357abd;
-            --danger-color: #e74c3c;
-            --success-color: #2ecc71;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            color: var(--text-color);
             padding: 20px;
             width: 380px;
             background-color: #fff;
-        }
-
-        h1 {
-            font-size: 1.5em;
-            margin-bottom: 1em;
-            color: var(--primary-color);
-        }
-
-        h3 {
-            font-size: 1.2em;
-            margin-bottom: 0.8em;
-            color: var(--text-color);
         }
 
         section {
@@ -53,6 +24,23 @@
 
         section:hover {
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        section {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* 保留仅页面特有的CSS */
+        h1 {
+            font-size: 1.5em;
+            margin-bottom: 1em;
+            color: var(--primary-color);
+        }
+
+        h3 {
+            font-size: 1.2em;
+            margin-bottom: 0.8em;
+            color: var(--text-color);
         }
 
         input[type="text"],
@@ -222,23 +210,6 @@
         .dialog-buttons button {
             padding: 8px 20px;
             min-width: 100px;
-        }
-
-        /* 添加动画效果 */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        section {
-            animation: fadeIn 0.3s ease-out;
         }
     </style>
 </head>
