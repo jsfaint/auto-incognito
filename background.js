@@ -1,9 +1,9 @@
 "use strict";
 
 try {
-    importScripts('lib/blacklist.js', 'lib/private.js');
+    importScripts('lib/blacklist.js', 'lib/private.js', 'lib/whitelist.js', 'lib/password.js');
 } catch (e) {
-    console.log(e);
+    console.log("Error importing scripts:", e);
 }
 
 const privateModeHandler = async (details) => {
@@ -20,7 +20,7 @@ const privateModeHandler = async (details) => {
         }
 
         const url = details.url;
-        const found = await findInBlacklist(url);
+        const found = await BlackList.check(url);
         if (!found) {
             return;
         }
@@ -48,7 +48,7 @@ const normalModeHandler = async (tabId, changeInfo, tab) => {
         }
 
         const url = changeInfo.url;
-        const found = await findInBlacklist(url);
+        const found = await BlackList.check(url);
         if (!found) {
             return;
         }
@@ -72,3 +72,4 @@ const getWindowState = async () => {
     const data = await chrome.storage.sync.get(['windowState']);
     return data.windowState;
 };
+

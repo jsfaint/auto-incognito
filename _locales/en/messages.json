@@ -100,5 +100,80 @@
     },
     "label_setting": {
         "message": "Setting"
+    },
+    "button_manage_blacklist": {
+        "message": "Manage Blacklist"
+    },
+    "blacklist_manager_title": {
+        "message": "Blacklist Manager"
+    },
+    "button_back": {
+        "message": "Back"
+    },
+    "button_select_all": {
+        "message": "Select All"
+    },
+    "button_deselect_all": {
+        "message": "Deselect All"
+    },
+    "button_delete_selected": {
+        "message": "Delete Selected"
+    },
+    "msg_empty_blacklist": {
+        "message": "Blacklist is empty"
+    },
+    "label_add_blacklist": {
+        "message": "Add to Blacklist"
+    },
+    "label_import_export": {
+        "message": "Import & Export"
+    },
+    "label_items": {
+        "message": "items"
+    },
+    "label_version": {
+        "message": "Version"
+    },
+    "msg_empty_url": {
+        "message": "Please enter a URL"
+    },
+    "msg_add_success": {
+        "message": "Added successfully"
+    },
+    "msg_add_fail": {
+        "message": "Add failed"
+    },
+    "msg_already_exists": {
+        "message": "URL already exists"
+    },
+    "msg_load_fail": {
+        "message": "Failed to load blacklist"
+    },
+    "msg_no_selection": {
+        "message": "Please select items to delete first"
+    },
+    "msg_delete_success": {
+        "message": "Successfully deleted {0} items"
+    },
+    "msg_delete_fail": {
+        "message": "Delete failed"
+    },
+    "msg_import_success": {
+        "message": "Successfully imported {0} items"
+    },
+    "msg_import_fail": {
+        "message": "Import failed"
+    },
+    "msg_export_success": {
+        "message": "Export successful"
+    },
+    "msg_export_fail": {
+        "message": "Export failed"
+    },
+    "msg_invalid_format": {
+        "message": "Invalid file format"
+    },
+    "msg_bookmark_fail": {
+        "message": "Failed to open bookmarks"
     }
 }

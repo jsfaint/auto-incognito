@@ -1,0 +1,117 @@
+body {
+    padding: 20px;
+    width: 380px;
+    background-color: #fff;
+}
+
+section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--secondary-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.3s ease-out;
+}
+
+section:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+#clear-password {
+    background-color: var(--danger-color);
+}
+
+#clear-password:hover {
+    background-color: #c0392b;
+}
+
+#blacklist {
+    list-style: none;
+    margin: 10px 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#blacklist li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    margin: 5px 0;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#password-option-form {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 15px;
+}
+
+.bookmark-dialog {
+    width: 90vw;
+    height: 90vh;
+    max-width: 600px;
+    max-height: 800px;
+    padding: 20px;
+    border: none;
+    border-radius: 12px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.bookmark-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+}
+
+.bookmark-tree {
+    height: calc(100% - 120px);
+    overflow-y: auto;
+    margin: 10px 0;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--secondary-color);
+}
+
+.bookmark-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin: 4px 0;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.bookmark-item:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+.dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.dialog-buttons button {
+    padding: 8px 20px;
+    min-width: 100px;
+}

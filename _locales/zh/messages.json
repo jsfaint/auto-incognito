@@ -100,5 +100,80 @@
     },
     "label_setting": {
         "message": "设置"
+    },
+    "button_manage_blacklist": {
+        "message": "管理黑名单"
+    },
+    "blacklist_manager_title": {
+        "message": "黑名单管理"
+    },
+    "button_back": {
+        "message": "返回"
+    },
+    "button_select_all": {
+        "message": "全选"
+    },
+    "button_deselect_all": {
+        "message": "取消全选"
+    },
+    "button_delete_selected": {
+        "message": "删除选中项"
+    },
+    "msg_empty_blacklist": {
+        "message": "黑名单为空"
+    },
+    "label_add_blacklist": {
+        "message": "添加黑名单"
+    },
+    "label_import_export": {
+        "message": "导入与导出"
+    },
+    "label_items": {
+        "message": "项"
+    },
+    "label_version": {
+        "message": "版本"
+    },
+    "msg_empty_url": {
+        "message": "请输入网址"
+    },
+    "msg_add_success": {
+        "message": "添加成功"
+    },
+    "msg_add_fail": {
+        "message": "添加失败"
+    },
+    "msg_already_exists": {
+        "message": "网址已存在"
+    },
+    "msg_load_fail": {
+        "message": "加载黑名单失败"
+    },
+    "msg_no_selection": {
+        "message": "请先选择要删除的项"
+    },
+    "msg_delete_success": {
+        "message": "成功删除 {0} 项"
+    },
+    "msg_delete_fail": {
+        "message": "删除失败"
+    },
+    "msg_import_success": {
+        "message": "成功导入 {0} 项"
+    },
+    "msg_import_fail": {
+        "message": "导入失败"
+    },
+    "msg_export_success": {
+        "message": "导出成功"
+    },
+    "msg_export_fail": {
+        "message": "导出失败"
+    },
+    "msg_invalid_format": {
+        "message": "无效的文件格式"
+    },
+    "msg_bookmark_fail": {
+        "message": "打开书签页失败"
     }
 }

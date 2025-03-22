@@ -44,21 +44,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnImport = document.getElementById('importButton');
 
     const btnImportBookmark = document.getElementById('importBookmarkButton');
+    const btnManageBlacklist = document.getElementById('manageBlacklistButton');
 
-    const displayBlacklist = async () => {
-        const blacklist = await getBlacklist();
-        const blacklistElement = document.getElementById('blacklist');
+    // 状态消息显示
+    const showStatus = (message, type = 'success') => {
+        const statusElem = document.getElementById('statusMessage');
+        if (!statusElem) return;
 
-        blacklistElement.innerHTML = '';
-        blacklist.forEach(url => {
-            const li = document.createElement('li');
-            li.textContent = url;
-            li.addEventListener('click', async () => {
-                await removeFromBlacklist(url);
-                displayBlacklist();
-            });
-            blacklistElement.appendChild(li);
-        });
+        statusElem.textContent = message;
+        statusElem.className = `status ${type}`;
+        statusElem.style.display = 'block';
+
+        // 3秒后自动隐藏
+        setTimeout(() => {
+            statusElem.style.display = 'none';
+        }, 3000);
     };
 
     const verifyPassword = async () => {
@@ -85,10 +85,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        if (await addToBlacklist(url)) {
+        if (await BlackList.add(url)) {
             // empty blacklist input
             InputURL.value = "";
-            displayBlacklist();
+            showStatus(chrome.i18n.getMessage("msg_add_success") || '添加成功');
+        } else {
+            showStatus(chrome.i18n.getMessage("msg_already_exists") || '网址已存在', 'error');
         }
     };
 
@@ -150,10 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const secondLevelDomain = parts.pop();
         const primaryDomain = `${secondLevelDomain}.${tld}`;
 
-        const blacklist = await getBlacklist();
-
-        if (await addToBlacklist(primaryDomain)) {
-            displayBlacklist();
+        if (await BlackList.add(primaryDomain)) {
             chrome.tabs.reload(tabs[0].id);
         }
     });
@@ -207,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     const exportBlacklist = async () => {
-        const blacklist = await getBlacklist();
+        const blacklist = await BlackList.getAll();
         const blob = new Blob([blacklist.join('\n')], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -224,14 +223,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const lines = text.split('\n').filter(line => line.trim());
         const whitelistFiltered = lines.filter(url => !findInWhitelist(url));
 
-        const currentBlacklist = await getBlacklist();
+        const currentBlacklist = await BlackList.getAll();
         const newBlacklist = [...new Set([...currentBlacklist, ...whitelistFiltered])];
 
-        await setBlacklist(newBlacklist);
-        displayBlacklist();
+        await BlackList.set(newBlacklist);
         alert(chrome.i18n.getMessage("alert_import_success", [whitelistFiltered.length]));
-        console.log(newBlacklist);
-        console.log(whitelistFiltered);
     };
 
     btnImport.addEventListener('click', () => {
@@ -252,8 +248,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 从收藏夹导入URL到黑名单
     const importFromBookmarks = async (selectedNodes) => {
         let count = 0;
-        const blacklist = await getBlacklist();
-        
+        const currentBlacklist = await BlackList.getAll();
+        const newUrls = [];
+
         // 递归处理书签文件夹
         const processNode = (node) => {
             if (node.url) {
@@ -270,30 +267,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const secondLevelDomain = parts.pop();
                     const primaryDomain = `${secondLevelDomain}.${tld}`;
 
-                    // 如果不在黑名单中，则添加
-                    if (!blacklist.includes(primaryDomain)) {
-                        blacklist.push(primaryDomain);
+                    // 只添加不在当前黑名单中的URL
+                    if (primaryDomain && !currentBlacklist.includes(primaryDomain) && !newUrls.includes(primaryDomain)) {
+                        newUrls.push(primaryDomain);
                         count++;
                     }
                 } catch (e) {
-                    console.error("Error processing bookmark URL:", node.url, e);
+                    // 忽略无效URL
+                    console.warn('无法处理的URL:', node.url, e);
                 }
             }
-            // 如果是文件夹，则递归处理
+
+            // 递归处理子文件夹
             if (node.children) {
                 node.children.forEach(processNode);
             }
         };
 
-        // 处理所有选中的节点
-        selectedNodes.forEach(processNode);
-        
-        if (count > 0) {
-            await setBlacklist(blacklist);
-            alert(chrome.i18n.getMessage("alert_import_bookmark_success", [count.toString()]));
-            displayBlacklist();
+        // 处理选中的节点
+        processNode(selectedNodes);
+
+        // 如果找到新URL，添加到黑名单
+        if (newUrls.length > 0) {
+            const newBlacklist = [...currentBlacklist, ...newUrls];
+            await BlackList.set(newBlacklist);
+            alert(chrome.i18n.getMessage("alert_import_bookmark_success", [count]));
+        } else {
+            alert(chrome.i18n.getMessage("alert_no_new_records"));
         }
-        return count;
     };
 
     btnImportBookmark.addEventListener('click', () => {
@@ -321,7 +322,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         formSetting.removeAttribute("hidden");
     }
 
-    displayBlacklist();
+    // 添加黑名单管理按钮事件
+    if (btnManageBlacklist) {
+        btnManageBlacklist.addEventListener('click', () => {
+            chrome.tabs.create({ url: 'blacklist-manager.html' });
+        });
+    }
 });
 
 const getWindowState = async () => {

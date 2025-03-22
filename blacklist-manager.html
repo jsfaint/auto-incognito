@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>__MSG_blacklist_manager_title__</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/blacklist-manager.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1 class="page-title">__MSG_blacklist_manager_title__</h1>
+            <button id="backButton" class="back-button">← __MSG_button_back__</button>
+        </header>
+
+        <div class="two-columns">
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">__MSG_label_add_blacklist__</div>
+                    </div>
+                    <input type="text" id="urlInput" placeholder="__MSG_placeholder_blacklist__">
+                    <button id="addButton">__MSG_button_add_blacklist__</button>
+                    <div id="statusMessage" class="status" style="display: none;"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">__MSG_label_import_export__</div>
+                    </div>
+                    <div class="button-group">
+                        <button id="importButton">__MSG_button_import__</button>
+                        <button id="importBookmarkButton">__MSG_button_import_bookmark__</button>
+                    </div>
+                    <div class="button-group">
+                        <button id="exportButton">__MSG_button_export__</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">__MSG_label_blacklist__</div>
+                    <span id="blacklist-count">0 __MSG_label_items__</span>
+                </div>
+
+                <div id="blacklist-selection-tools">
+                    <div class="action-buttons">
+                        <button id="selectAllButton">__MSG_button_select_all__</button>
+                        <button id="deselectAllButton">__MSG_button_deselect_all__</button>
+                    </div>
+                    <button id="deleteSelectedButton" class="button-danger">__MSG_button_delete_selected__</button>
+                </div>
+
+                <ul id="blacklist"></ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Auto Private Mode - __MSG_label_version__ <span id="version"></span></p>
+        </footer>
+    </div>
+
+    <script src="blacklist-manager.js"></script>
+    <script src="lib/blacklist.js"></script>
+    <script src="lib/whitelist.js"></script>
+</body>
+
+</html>
