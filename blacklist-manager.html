@@ -263,16 +263,12 @@
             }
         }
     </style>
-
-    <!-- 然后尝试加载原始库文件 -->
-    <script src="lib/blacklist.js"></script>
-    <script src="lib/whitelist.js"></script>
 </head>
 
 <body>
     <div class="container">
         <header>
-            <h1 class="page-title">__MSG_label_blacklist_management__</h1>
+            <h1 class="page-title">__MSG_blacklist_manager_title__</h1>
             <button id="backButton" class="back-button">← __MSG_button_back__</button>
         </header>
 
@@ -328,6 +324,7 @@
     <!-- 确保JS在DOM加载完成后加载 -->
     <script src="blacklist-manager.js"></script>
     <script src="lib/blacklist.js"></script>
+    <script src="lib/whitelist.js"></script>
 </body>
 
 </html>
