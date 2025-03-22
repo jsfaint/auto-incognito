@@ -157,6 +157,11 @@
             margin-bottom: 15px;
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
         #blacklist {
             list-style: none;
             margin: 10px 0;
@@ -208,21 +213,6 @@
             text-align: center;
             color: #95a5a6;
             font-style: italic;
-        }
-
-        .actions-bar {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 25px;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
         }
 
         .status {
@@ -353,14 +343,6 @@
             <button id="backButton" class="back-button">← __MSG_button_back__</button>
         </header>
 
-        <div class="actions-bar">
-            <div class="action-buttons">
-                <button id="selectAllButton">__MSG_button_select_all__</button>
-                <button id="deselectAllButton">__MSG_button_deselect_all__</button>
-            </div>
-            <button id="deleteSelectedButton" class="button-danger">__MSG_button_delete_selected__</button>
-        </div>
-
         <div class="two-columns">
             <div>
                 <div class="card">
@@ -379,6 +361,8 @@
                     <div class="button-group">
                         <button id="importButton">__MSG_button_import__</button>
                         <button id="importBookmarkButton">__MSG_button_import_bookmark__</button>
+                    </div>
+                    <div class="button-group">
                         <button id="exportButton">__MSG_button_export__</button>
                     </div>
                 </div>
@@ -389,6 +373,16 @@
                     <div class="card-title">__MSG_label_blacklist__</div>
                     <span id="blacklist-count">0 __MSG_label_items__</span>
                 </div>
+
+                <!-- 移动到这里：操作按钮 -->
+                <div id="blacklist-selection-tools">
+                    <div class="action-buttons">
+                        <button id="selectAllButton">__MSG_button_select_all__</button>
+                        <button id="deselectAllButton">__MSG_button_deselect_all__</button>
+                    </div>
+                    <button id="deleteSelectedButton" class="button-danger">__MSG_button_delete_selected__</button>
+                </div>
+
                 <ul id="blacklist"></ul>
             </div>
         </div>
