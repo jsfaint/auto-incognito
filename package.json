@@ -1,0 +1,19 @@
+{
+    "name": "auto-incognito",
+    "version": "0.8.0",
+    "description": "自动将特定网站在隐私模式中打开的Chrome扩展",
+    "scripts": {
+        "test": "jest tests/simple.test.js tests/blacklist-simple.test.js"
+    },
+    "devDependencies": {
+        "jest": "^27.5.1",
+        "jest-chrome": "^0.8.0",
+        "jest-environment-jsdom": "^27.5.1"
+    },
+    "jest": {
+        "testEnvironment": "jsdom",
+        "setupFiles": [
+            "./tests/setup.js"
+        ]
+    }
+}
