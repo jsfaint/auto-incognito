@@ -1,0 +1,98 @@
+body {
+    min-width: 400px;
+    min-height: 500px;
+    padding: 25px;
+    background-color: #fff;
+    line-height: 1.5;
+}
+
+h3 {
+    font-size: 1.5em;
+    margin-bottom: 1.2em;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.bookmark-tree {
+    height: 70vh;
+    overflow-y: auto;
+    margin: 15px 0;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--secondary-color);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.bookmark-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 4px 0;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.bookmark-item:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+    transform: translateX(2px);
+}
+
+.bookmark-item label {
+    margin-left: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 0 5px;
+}
+
+button {
+    padding: 10px 24px;
+    min-width: 100px;
+}
+
+#cancelImport {
+    background-color: #f5f6fa;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+#cancelImport:hover {
+    background-color: #e8e9ec;
+}
+
+.toggle {
+    transition: transform 0.3s ease;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px;
+    color: var(--primary-color);
+}
+
+.children {
+    margin-left: 28px;
+    position: relative;
+}
+
+.children::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--border-color);
+    opacity: 0.5;
+}
