@@ -168,4 +168,96 @@ describe('BlackList 模块', () => {
             expect.any(Function)
         );
     });
-}); 
+
+    test('removeBatch方法应批量移除多个URL', async () => {
+        const urls = ['example.com', 'test.com', 'sample.com'];
+        const remainingUrl = 'remaining.com';
+        const existingBlacklist = [...urls, remainingUrl];
+        const expectedBlacklist = [remainingUrl];
+
+        // 模拟初始获取blacklist
+        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+            callback({ blacklist: existingBlacklist });
+            return Promise.resolve({ blacklist: existingBlacklist });
+        });
+
+        // 模拟存储更新后的blacklist
+        mockChrome.storage.local.set.mockImplementation((data, callback) => {
+            callback();
+            return Promise.resolve();
+        });
+
+        const result = await BlackList.removeBatch(urls);
+        expect(result).toBe(3); // 应返回移除的数量
+        expect(mockChrome.storage.local.set).toHaveBeenCalledWith(
+            { blacklist: expectedBlacklist },
+            expect.any(Function)
+        );
+    });
+
+    test('removeBatch方法对空数组或无效输入应返回0', async () => {
+        const existingBlacklist = ['example.com', 'test.com'];
+
+        // 模拟初始获取blacklist
+        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+            callback({ blacklist: existingBlacklist });
+            return Promise.resolve({ blacklist: existingBlacklist });
+        });
+
+        // 测试空数组
+        let result = await BlackList.removeBatch([]);
+        expect(result).toBe(0);
+        expect(mockChrome.storage.local.set).not.toHaveBeenCalled();
+
+        // 测试null
+        result = await BlackList.removeBatch(null);
+        expect(result).toBe(0);
+        expect(mockChrome.storage.local.set).not.toHaveBeenCalled();
+
+        // 测试undefined
+        result = await BlackList.removeBatch(undefined);
+        expect(result).toBe(0);
+        expect(mockChrome.storage.local.set).not.toHaveBeenCalled();
+    });
+
+    test('removeBatch方法对不存在的URL应正确处理', async () => {
+        const existingBlacklist = ['example.com', 'test.com'];
+        const nonExistingUrls = ['nonexisting1.com', 'nonexisting2.com'];
+
+        // 模拟初始获取blacklist
+        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+            callback({ blacklist: existingBlacklist });
+            return Promise.resolve({ blacklist: existingBlacklist });
+        });
+
+        const result = await BlackList.removeBatch(nonExistingUrls);
+        expect(result).toBe(0); // 没有任何URL被删除
+        expect(mockChrome.storage.local.set).not.toHaveBeenCalled();
+    });
+
+    test('removeBatch方法对部分存在的URL应正确处理', async () => {
+        const existingUrl = 'example.com';
+        const nonExistingUrl = 'nonexisting.com';
+        const existingBlacklist = [existingUrl, 'test.com'];
+        const expectedBlacklist = ['test.com'];
+
+        // 模拟初始获取blacklist
+        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+            callback({ blacklist: existingBlacklist });
+            return Promise.resolve({ blacklist: existingBlacklist });
+        });
+
+        // 模拟存储更新后的blacklist
+        mockChrome.storage.local.set.mockImplementation((data, callback) => {
+            callback();
+            return Promise.resolve();
+        });
+
+        const result = await BlackList.removeBatch([existingUrl, nonExistingUrl]);
+        expect(result).toBe(1); // 只有一个URL被删除
+        expect(mockChrome.storage.local.set).toHaveBeenCalledWith(
+            { blacklist: expectedBlacklist },
+            expect.any(Function)
+        );
+    });
+});
