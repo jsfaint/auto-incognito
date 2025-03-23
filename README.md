@@ -39,6 +39,34 @@ Install the extension from:
 - [Microsoft Edge Extension Store](https://microsoftedge.microsoft.com/addons/detail/jifongmjndlfaakddlefojdgnijchfio)
 - [Chrome Web Store](https://chromewebstore.google.com/detail/%E8%87%AA%E5%8A%A8%E9%9A%90%E7%A7%81%E6%A8%A1%E5%BC%8F/iligdhpfclclkdegfdicjniagankbpdb)
 
+## Development
+
+### Testing
+
+The extension uses [Bun](https://bun.sh/) as the test runner. To run tests:
+
+1. Install dependencies:
+   ```bash
+   bun install
+   ```
+
+2. Run tests:
+   ```bash
+   bun test
+   ```
+
+3. Run tests in watch mode:
+   ```bash
+   bun test:watch
+   ```
+
+4. Generate test coverage report:
+   ```bash
+   bun test:coverage
+   ```
+
+For more details about testing, check out the [test documentation](./test/README.md).
+
 ## Privacy Statement
 
 This extension does not collect any user data. All blacklist and configuration information is stored locally in your browser.
