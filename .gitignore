@@ -1,5 +1,13 @@
 node_modules/
+.DS_Store
+.vscode
 *.zip
 *.tar
 *.tar.gz
 *.tgz
+*.swp
+*.swo
+*.log
+.bun/
+bun.lockb
+coverage/

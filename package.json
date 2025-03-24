@@ -1,0 +1,34 @@
+{
+    "name": "auto-incognito",
+    "version": "1.0.0",
+    "description": "A browser extension that automatically opens specified websites in incognito/private mode",
+    "main": "background.js",
+    "scripts": {
+        "test": "bun test",
+        "test:watch": "bun test --watch",
+        "test:coverage": "bun test --coverage",
+        "test:debug": "bun test --bail --trace"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jsfaint/auto-incognito.git"
+    },
+    "keywords": [
+        "chrome-extension",
+        "incognito",
+        "privacy"
+    ],
+    "author": "Jia Sui (jsfaint@gmail.com)",
+    "license": "MIT",
+    "devDependencies": {
+        "bun": "^1.0.0",
+        "jsdom": "^24.0.0"
+    },
+    "bun": {
+        "test": {
+            "preload": [
+                "./test/setupTest.js"
+            ]
+        }
+    }
+}
