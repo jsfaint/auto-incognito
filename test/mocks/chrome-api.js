@@ -31,7 +31,8 @@ const mockTabs = {
 };
 
 const mockWindows = {
-    create: vi.fn()
+    create: vi.fn(),
+    getAll: vi.fn()
 };
 
 const mockWebNavigation = {
@@ -85,6 +86,7 @@ export function resetMocks() {
 
     // 重置windows
     mockWindows.create.mockResolvedValue({});
+    mockWindows.getAll.mockResolvedValue([]);
 
     // 重置history
     mockHistory.deleteUrl.mockResolvedValue();

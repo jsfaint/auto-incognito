@@ -18,29 +18,29 @@ describe('BlackList 模块', () => {
     });
 
     test('getAll方法应返回空数组当存储中没有blacklist', async () => {
-        // 模拟chrome.storage.local.get返回空对象
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        // 模拟chrome.storage.sync.get返回空对象
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({});
             return Promise.resolve({});
         });
 
         const result = await BlackList.getAll();
         expect(result).toEqual([]);
-        expect(mockChrome.storage.local.get).toHaveBeenCalledWith(['blacklist'], expect.any(Function));
+        expect(mockChrome.storage.sync.get).toHaveBeenCalledWith(['blacklist'], expect.any(Function));
     });
 
     test('getAll方法应返回存储中的blacklist数组', async () => {
         const mockBlacklist = ['example.com', 'test.com'];
 
-        // 模拟chrome.storage.local.get返回包含blacklist的对象
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        // 模拟chrome.storage.sync.get返回包含blacklist的对象
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({ blacklist: mockBlacklist });
             return Promise.resolve({ blacklist: mockBlacklist });
         });
 
         const result = await BlackList.getAll();
         expect(result).toEqual(mockBlacklist);
-        expect(mockChrome.storage.local.get).toHaveBeenCalledWith(['blacklist'], expect.any(Function));
+        expect(mockChrome.storage.sync.get).toHaveBeenCalledWith(['blacklist'], expect.any(Function));
     });
 
     test('add方法应添加新URL到blacklist', async () => {
@@ -49,20 +49,20 @@ describe('BlackList 模块', () => {
         const expectedBlacklist = [...existingBlacklist, newUrl];
 
         // 模拟初始获取blacklist
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({ blacklist: existingBlacklist });
             return Promise.resolve({ blacklist: existingBlacklist });
         });
 
         // 模拟存储更新后的blacklist
-        mockChrome.storage.local.set.mockImplementation((data, callback) => {
+        mockChrome.storage.sync.set.mockImplementation((data, callback) => {
             callback();
             return Promise.resolve();
         });
 
         const result = await BlackList.add(newUrl);
         expect(result).toBe(true);
-        expect(mockChrome.storage.local.set).toHaveBeenCalledWith(
+        expect(mockChrome.storage.sync.set).toHaveBeenCalledWith(
             { blacklist: expectedBlacklist },
             expect.any(Function)
         );
@@ -73,14 +73,14 @@ describe('BlackList 模块', () => {
         const existingBlacklist = [existingUrl];
 
         // 模拟初始获取blacklist
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({ blacklist: existingBlacklist });
             return Promise.resolve({ blacklist: existingBlacklist });
         });
 
         const result = await BlackList.add(existingUrl);
         expect(result).toBe(false);
-        expect(mockChrome.storage.local.set).not.toHaveBeenCalled();
+        expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
     });
 
     test('remove方法应从blacklist中移除指定URL', async () => {
@@ -90,20 +90,20 @@ describe('BlackList 模块', () => {
         const expectedBlacklist = [url2];
 
         // 模拟初始获取blacklist
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({ blacklist: existingBlacklist });
             return Promise.resolve({ blacklist: existingBlacklist });
         });
 
         // 模拟存储更新后的blacklist
-        mockChrome.storage.local.set.mockImplementation((data, callback) => {
+        mockChrome.storage.sync.set.mockImplementation((data, callback) => {
             callback();
             return Promise.resolve();
         });
 
         const result = await BlackList.remove(url1);
         expect(result).toBe(true);
-        expect(mockChrome.storage.local.set).toHaveBeenCalledWith(
+        expect(mockChrome.storage.sync.set).toHaveBeenCalledWith(
             { blacklist: expectedBlacklist },
             expect.any(Function)
         );
@@ -114,21 +114,21 @@ describe('BlackList 模块', () => {
         const nonExistingUrl = 'nonexisting.com';
 
         // 模拟初始获取blacklist
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({ blacklist: existingBlacklist });
             return Promise.resolve({ blacklist: existingBlacklist });
         });
 
         const result = await BlackList.remove(nonExistingUrl);
         expect(result).toBe(false);
-        expect(mockChrome.storage.local.set).not.toHaveBeenCalled();
+        expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
     });
 
     test('check方法应正确检测URL是否在黑名单中', async () => {
         const blacklist = ['example.com', 'test.com'];
 
         // 模拟获取blacklist
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({ blacklist });
             return Promise.resolve({ blacklist });
         });
@@ -156,14 +156,14 @@ describe('BlackList 模块', () => {
         const newBlacklist = ['domain1.com', 'domain2.com'];
 
         // 模拟存储更新
-        mockChrome.storage.local.set.mockImplementation((data, callback) => {
+        mockChrome.storage.sync.set.mockImplementation((data, callback) => {
             callback();
             return Promise.resolve();
         });
 
         const result = await BlackList.set(newBlacklist);
         expect(result).toBe(true);
-        expect(mockChrome.storage.local.set).toHaveBeenCalledWith(
+        expect(mockChrome.storage.sync.set).toHaveBeenCalledWith(
             { blacklist: newBlacklist },
             expect.any(Function)
         );
@@ -176,20 +176,20 @@ describe('BlackList 模块', () => {
         const expectedBlacklist = [remainingUrl];
 
         // 模拟初始获取blacklist
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({ blacklist: existingBlacklist });
             return Promise.resolve({ blacklist: existingBlacklist });
         });
 
         // 模拟存储更新后的blacklist
-        mockChrome.storage.local.set.mockImplementation((data, callback) => {
+        mockChrome.storage.sync.set.mockImplementation((data, callback) => {
             callback();
             return Promise.resolve();
         });
 
         const result = await BlackList.removeBatch(urls);
         expect(result).toBe(3); // 应返回移除的数量
-        expect(mockChrome.storage.local.set).toHaveBeenCalledWith(
+        expect(mockChrome.storage.sync.set).toHaveBeenCalledWith(
             { blacklist: expectedBlacklist },
             expect.any(Function)
         );
@@ -199,7 +199,7 @@ describe('BlackList 模块', () => {
         const existingBlacklist = ['example.com', 'test.com'];
 
         // 模拟初始获取blacklist
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({ blacklist: existingBlacklist });
             return Promise.resolve({ blacklist: existingBlacklist });
         });
@@ -207,17 +207,17 @@ describe('BlackList 模块', () => {
         // 测试空数组
         let result = await BlackList.removeBatch([]);
         expect(result).toBe(0);
-        expect(mockChrome.storage.local.set).not.toHaveBeenCalled();
+        expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
 
         // 测试null
         result = await BlackList.removeBatch(null);
         expect(result).toBe(0);
-        expect(mockChrome.storage.local.set).not.toHaveBeenCalled();
+        expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
 
         // 测试undefined
         result = await BlackList.removeBatch(undefined);
         expect(result).toBe(0);
-        expect(mockChrome.storage.local.set).not.toHaveBeenCalled();
+        expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
     });
 
     test('removeBatch方法对不存在的URL应正确处理', async () => {
@@ -225,14 +225,14 @@ describe('BlackList 模块', () => {
         const nonExistingUrls = ['nonexisting1.com', 'nonexisting2.com'];
 
         // 模拟初始获取blacklist
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({ blacklist: existingBlacklist });
             return Promise.resolve({ blacklist: existingBlacklist });
         });
 
         const result = await BlackList.removeBatch(nonExistingUrls);
         expect(result).toBe(0); // 没有任何URL被删除
-        expect(mockChrome.storage.local.set).not.toHaveBeenCalled();
+        expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
     });
 
     test('removeBatch方法对部分存在的URL应正确处理', async () => {
@@ -242,20 +242,20 @@ describe('BlackList 模块', () => {
         const expectedBlacklist = ['test.com'];
 
         // 模拟初始获取blacklist
-        mockChrome.storage.local.get.mockImplementation((keys, callback) => {
+        mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             callback({ blacklist: existingBlacklist });
             return Promise.resolve({ blacklist: existingBlacklist });
         });
 
         // 模拟存储更新后的blacklist
-        mockChrome.storage.local.set.mockImplementation((data, callback) => {
+        mockChrome.storage.sync.set.mockImplementation((data, callback) => {
             callback();
             return Promise.resolve();
         });
 
         const result = await BlackList.removeBatch([existingUrl, nonExistingUrl]);
         expect(result).toBe(1); // 只有一个URL被删除
-        expect(mockChrome.storage.local.set).toHaveBeenCalledWith(
+        expect(mockChrome.storage.sync.set).toHaveBeenCalledWith(
             { blacklist: expectedBlacklist },
             expect.any(Function)
         );

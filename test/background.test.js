@@ -70,6 +70,9 @@ describe('Background 脚本测试', () => {
         // 模拟getWindowState返回'maximized'
         global.getWindowState.mockResolvedValue('maximized');
 
+        // 模拟 windows.getAll 返回空数组（没有现有的隐私窗口）
+        mockChrome.windows.getAll.mockResolvedValue([]);
+
         // 调用privateModeHandler函数
         await privateModeListener({ tabId: 123, url: 'https://example.com' });
 
@@ -170,4 +173,4 @@ describe('Background 脚本测试', () => {
         // 验证行为 - 不应该注册onRemoved侦听器
         expect(mockChrome.tabs.onRemoved.addListener).not.toHaveBeenCalled();
     });
-}); 
+});

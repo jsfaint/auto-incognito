@@ -51,4 +51,4 @@ describe('Private 模块', () => {
         await setPrivateOption(false);
         expect(mockChrome.storage.sync.set).toHaveBeenCalled();
     });
-}); 
+});

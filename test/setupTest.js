@@ -10,4 +10,4 @@ beforeEach(() => {
     resetMocks();
 });
 
-console.log('Bun测试环境已初始化'); 
+console.log('Bun测试环境已初始化');
