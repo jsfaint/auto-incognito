@@ -11,3 +11,10 @@ node_modules/
 .bun/
 bun.lockb
 coverage/
+
+# Private individual user cursor rules
+.cursor/rules/_*.mdc
+
+# Documentation and templates
+xnotes/
+docs/
