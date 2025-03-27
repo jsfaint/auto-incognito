@@ -28,12 +28,33 @@ const privateModeHandler = async (details) => {
         // Close current tab
         await chrome.tabs.remove(details.tabId);
 
-        // Create a new private window
-        await chrome.windows.create({
-            url: url,
-            incognito: true,
-            state: await getWindowState() || 'maximized'
-        });
+        const state = await getWindowState();
+        const windows = await chrome.windows.getAll();
+        const incognitoWindow = windows.find(window => window.incognito);
+
+        console.log("windows:", windows);
+        console.log("incognitoWindow:", incognitoWindow);
+
+        if (state === 'tabbed') {
+            if (incognitoWindow !== undefined && state === 'tabbed') {
+                await chrome.tabs.create({
+                    url: url,
+                    windowId: incognitoWindow.id
+                });
+            } else {
+                await chrome.windows.create({
+                    url: url,
+                    incognito: true,
+                    state: 'maximized'
+                });
+            }
+        } else {
+            await chrome.windows.create({
+                url: url,
+                incognito: true,
+                state: await getWindowState() || 'maximized'
+            });
+        }
     } catch (e) {
         console.log("Error in tab update handler:", e);
     }

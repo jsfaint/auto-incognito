@@ -98,6 +98,9 @@
     "option_new_window": {
         "message": "New window"
     },
+    "option_new_tab": {
+        "message": "New tab"
+    },
     "label_setting": {
         "message": "Setting"
     },

@@ -98,6 +98,9 @@
     "option_new_window": {
         "message": "新窗口"
     },
+    "option_new_tab": {
+        "message": "新标签页"
+    },
     "label_setting": {
         "message": "设置"
     },
