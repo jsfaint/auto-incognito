@@ -329,10 +329,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 });
-
-const getWindowState = async () => {
-    const data = await chrome.storage.sync.get(['windowState']);
-    return data.windowState;
-};
-
-const setWindowState = async (state) => await chrome.storage.sync.set({ windowState: state });

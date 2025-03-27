@@ -67,9 +67,3 @@ const normalModeHandler = async (tabId, changeInfo, tab) => {
 };
 
 chrome.tabs.onUpdated.addListener(normalModeHandler);
-
-const getWindowState = async () => {
-    const data = await chrome.storage.sync.get(['windowState']);
-    return data.windowState;
-};
-
