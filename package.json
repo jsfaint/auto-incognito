@@ -20,10 +20,7 @@
     ],
     "author": "Jia Sui (jsfaint@gmail.com)",
     "license": "MIT",
-    "devDependencies": {
-        "bun": "^1.0.0",
-        "jsdom": "^24.0.0"
-    },
+    "devDependencies": {},
     "bun": {
         "test": {
             "preload": [
