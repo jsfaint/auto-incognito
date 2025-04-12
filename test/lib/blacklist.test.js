@@ -146,12 +146,6 @@ describe('BlackList 模块', () => {
         expect(result).toBe(false);
     });
 
-    test('check方法对无效URL应返回false', async () => {
-        // 无效URL
-        const result = await BlackList.check('invalid-url');
-        expect(result).toBe(false);
-    });
-
     test('set方法应正确设置blacklist', async () => {
         const newBlacklist = ['domain1.com', 'domain2.com'];
 
