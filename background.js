@@ -97,7 +97,7 @@ const normalModeHandler = async (tabId, changeInfo, tab) => {
 
         chrome.tabs.onRemoved.addListener(removeHistoryListener);
     } catch (e) {
-        console.log("tab:", tab)
+        console.log("normalModeHandler: ", e);
     }
 };
 
