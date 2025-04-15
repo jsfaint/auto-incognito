@@ -6,6 +6,23 @@ try {
     console.log("Error importing scripts:", e);
 }
 
+// 保持service worker活跃的心跳
+const keepAlive = () => {
+    const keepAliveInterval = 20; // 20秒间隔
+    chrome.alarms.create('keepAlive', {
+        periodInMinutes: keepAliveInterval / 60
+    });
+};
+
+// 监听alarm事件
+chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === 'keepAlive') {
+        console.log('keepAlive', alarm);
+    }
+});
+
+keepAlive();
+
 const privateModeHandler = async (details) => {
     try {
         const tab = await chrome.tabs.get(details.tabId);

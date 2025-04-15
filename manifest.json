@@ -9,7 +9,8 @@
         "tabs",
         "history",
         "webNavigation",
-        "bookmarks"
+        "bookmarks",
+        "alarms"
     ],
     "background": {
         "service_worker": "background.js"
