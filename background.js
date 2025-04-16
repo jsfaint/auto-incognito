@@ -6,16 +6,33 @@ try {
     console.log("Error importing scripts:", e);
 }
 
+// 保持service worker活跃的心跳
+const keepAlive = () => {
+    const keepAliveInterval = 20; // 20秒间隔
+    chrome.alarms.create('keepAlive', {
+        periodInMinutes: keepAliveInterval / 60
+    });
+};
+
+// 监听alarm事件
+chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === 'keepAlive') {
+        console.log('keepAlive', alarm);
+    }
+});
+
+keepAlive();
+
 const privateModeHandler = async (details) => {
     try {
-        const tab = await chrome.tabs.get(details.tabId);
-        if (tab === undefined || tab.incognito) {
-            return;
-        }
-
         // if private option was disabled, skip it.
         const privateOption = await getPrivateOption();
         if (!privateOption) {
+            return;
+        }
+
+        const tab = await chrome.tabs.get(details.tabId);
+        if (tab === undefined || tab.incognito) {
             return;
         }
 
@@ -31,9 +48,6 @@ const privateModeHandler = async (details) => {
         const state = await getWindowState();
         const windows = await chrome.windows.getAll();
         const incognitoWindow = windows.find(window => window.incognito);
-
-        console.log("windows:", windows);
-        console.log("incognitoWindow:", incognitoWindow);
 
         if (state === 'tabbed') {
             if (incognitoWindow !== undefined && state === 'tabbed') {
@@ -56,7 +70,7 @@ const privateModeHandler = async (details) => {
             });
         }
     } catch (e) {
-        console.log("Error in tab update handler:", e);
+        console.log("privateModeHandler: ", e);
     }
 };
 
@@ -83,7 +97,7 @@ const normalModeHandler = async (tabId, changeInfo, tab) => {
 
         chrome.tabs.onRemoved.addListener(removeHistoryListener);
     } catch (e) {
-        console.log("Error in tab update handler:", e);
+        console.log("normalModeHandler: ", e);
     }
 };
 
