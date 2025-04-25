@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnImportBookmark = document.getElementById('importBookmarkButton');
     const btnManageBlacklist = document.getElementById('manageBlacklistButton');
 
-    // 状态消息显示
+    // Status message display
     const showStatus = (message, type = 'success') => {
         const statusElem = document.getElementById('statusMessage');
         if (!statusElem) return;
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusElem.className = `status ${type}`;
         statusElem.style.display = 'block';
 
-        // 3秒后自动隐藏
+        // Auto hide after 3 seconds
         setTimeout(() => {
             statusElem.style.display = 'none';
         }, 3000);
@@ -123,11 +123,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const windowStateSelect = document.getElementById('window-state');
 
-        // 初始化窗口状态
+        // Initialize window state
         const windowState = await getWindowState();
         windowStateSelect.value = windowState || 'maximized';
 
-        // 添加事件监听
+        // Add event listener
         windowStateSelect.addEventListener('change', async () => {
             await setWindowState(windowStateSelect.value);
         });
@@ -245,49 +245,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         input.click();
     });
 
-    // 从收藏夹导入URL到黑名单
+    // Import URLs from bookmarks to blacklist
     const importFromBookmarks = async (selectedNodes) => {
         let count = 0;
         const currentBlacklist = await BlackList.getAll();
         const newUrls = [];
 
-        // 递归处理书签文件夹
+        // Recursively process bookmark folders
         const processNode = (node) => {
             if (node.url) {
                 try {
-                    // 跳过白名单中的URL
+                    // Skip URLs in whitelist
                     if (findInWhitelist(node.url)) {
                         return;
                     }
 
-                    // 提取主域名
+                    // Extract primary domain
                     const hostname = new URL(node.url).hostname;
                     const parts = hostname.split('.');
                     const tld = parts.pop();
                     const secondLevelDomain = parts.pop();
                     const primaryDomain = `${secondLevelDomain}.${tld}`;
 
-                    // 只添加不在当前黑名单中的URL
+                    // Only add URLs not in current blacklist
                     if (primaryDomain && !currentBlacklist.includes(primaryDomain) && !newUrls.includes(primaryDomain)) {
                         newUrls.push(primaryDomain);
                         count++;
                     }
                 } catch (e) {
-                    // 忽略无效URL
-                    console.warn('无法处理的URL:', node.url, e);
+                    // Ignore invalid URLs
+                    console.warn('Unable to process URL:', node.url, e);
                 }
             }
 
-            // 递归处理子文件夹
+            // Recursively process subfolders
             if (node.children) {
                 node.children.forEach(processNode);
             }
         };
 
-        // 处理选中的节点
+        // Process selected nodes
         processNode(selectedNodes);
 
-        // 如果找到新URL，添加到黑名单
+        // If new URLs found, add to blacklist
         if (newUrls.length > 0) {
             const newBlacklist = [...currentBlacklist, ...newUrls];
             await BlackList.set(newBlacklist);
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formSetting.removeAttribute("hidden");
     }
 
-    // 添加黑名单管理按钮事件
+    // Add blacklist management button event
     if (btnManageBlacklist) {
         btnManageBlacklist.addEventListener('click', () => {
             chrome.tabs.create({ url: 'blacklist-manager.html' });
