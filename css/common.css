@@ -32,7 +32,7 @@ h3 {
     color: var(--text-color);
 }
 
-/* 通用输入框样式 */
+/* Common input field styles */
 input[type="text"],
 input[type="password"] {
     width: 100%;
@@ -83,7 +83,7 @@ input[type="checkbox"]:indeterminate::before {
     transform: translate(-50%, -50%);
 }
 
-/* 通用按钮样式 */
+/* Common button styles */
 button {
     padding: 10px 15px;
     background-color: var(--primary-color);
@@ -121,7 +121,7 @@ button:hover {
     font-size: 13px;
 }
 
-/* 通用状态消息样式 */
+/* Common status message styles */
 .status {
     margin-top: 10px;
     padding: 10px;
@@ -139,7 +139,7 @@ button:hover {
     color: var(--danger-color);
 }
 
-/* 通用下拉菜单样式 */
+/* Common dropdown menu styles */
 select {
     padding: 8px;
     border: 1px solid var(--border-color);
@@ -154,7 +154,7 @@ select:focus {
     border-color: var(--primary-color);
 }
 
-/* 卡片组件 */
+/* Card component */
 .card {
     background: white;
     border-radius: 8px;
@@ -184,14 +184,14 @@ select:focus {
     color: var(--primary-color);
 }
 
-/* 通用标签样式 */
+/* Common label styles */
 label {
     font-size: 15px;
     color: var(--text-color);
     font-weight: 500;
 }
 
-/* 列表组件 */
+/* List component */
 .list-container {
     list-style: none;
     margin: 10px 0;
@@ -218,14 +218,14 @@ label {
     background-color: rgba(74, 144, 226, 0.05);
 }
 
-/* 容器样式 */
+/* Container styles */
 .container {
     max-width: 1000px;
     margin: 0 auto;
     padding: 30px;
 }
 
-/* 动画效果 */
+/* Animation effects */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -238,7 +238,7 @@ label {
     }
 }
 
-/* 自定义滚动条 */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -257,7 +257,7 @@ label {
     background: #a8b2bd;
 }
 
-/* 空状态提示 */
+/* Empty list state */
 .empty-list {
     padding: 30px;
     text-align: center;
@@ -265,7 +265,6 @@ label {
     font-style: italic;
 }
 
-/* 媒体查询 */
 @media (max-width: 768px) {
     .container {
         padding: 15px;
