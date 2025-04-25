@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('黑名单管理页面加载中...');
+    console.log('Loading blacklist management page...');
 
-    // 国际化处理
+    // Internationalization handling
     const localizeHtmlPage = () => {
         try {
             //Localize by replacing __MSG_***__ meta tags
@@ -19,18 +19,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         } catch (error) {
-            console.error('国际化处理失败:', error);
+            console.error('Internationalization failed:', error);
         }
     };
 
-    // 尝试调用本地化函数
+    // Try to call localization function
     try {
         localizeHtmlPage();
     } catch (error) {
-        console.error('本地化处理失败:', error);
+        console.error('Localization failed:', error);
     }
 
-    // 状态消息显示
+    // Status message display
     const showStatus = (message, type = 'success') => {
         const statusElem = document.getElementById('statusMessage');
         if (!statusElem) return;
@@ -39,18 +39,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusElem.className = `status ${type}`;
         statusElem.style.display = 'block';
 
-        // 3秒后自动隐藏
+        // Auto hide after 3 seconds
         setTimeout(() => {
             statusElem.style.display = 'none';
         }, 3000);
     };
 
-    // 返回按钮
+    // Back button
     const backButton = document.getElementById('backButton');
     if (backButton) {
         backButton.addEventListener('click', () => {
             window.close();
-            // 确保在新标签中时返回popup
+            // Ensure return to popup when in new tab
             try {
                 chrome.runtime.openOptionsPage();
             } catch (e) {
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 添加黑名单
+    // Add to blacklist
     const addButton = document.getElementById('addButton');
     const urlInput = document.getElementById('urlInput');
 
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 选择工具
+    // Selection tools
     const selectAllButton = document.getElementById('selectAllButton');
     const deselectAllButton = document.getElementById('deselectAllButton');
     const deleteSelectedButton = document.getElementById('deleteSelectedButton');
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         deleteSelectedButton.addEventListener('click', deleteSelected);
     }
 
-    // 导入导出功能
+    // Import/Export functionality
     const importButton = document.getElementById('importButton');
     const exportButton = document.getElementById('exportButton');
     const importBookmarkButton = document.getElementById('importBookmarkButton');
@@ -94,19 +94,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         importBookmarkButton.addEventListener('click', importBookmark);
     }
 
-    // 初始化显示黑名单
+    // Initialize blacklist display
     try {
         await loadBlacklist();
     } catch (error) {
-        console.error('加载黑名单失败:', error);
-        showStatus(chrome.i18n.getMessage('msg_load_fail') || '加载黑名单失败', 'error');
+        console.error('Failed to load blacklist:', error);
+        showStatus(chrome.i18n.getMessage('msg_load_fail') || 'Failed to load blacklist', 'error');
     }
 
-    // 添加网址到黑名单
+    // Add URL to blacklist
     async function addUrlToBlacklist() {
         const url = urlInput.value.trim();
         if (!url) {
-            showStatus(chrome.i18n.getMessage('msg_empty_url') || '请输入网址', 'error');
+            showStatus(chrome.i18n.getMessage('msg_empty_url') || 'Please enter URL', 'error');
             return;
         }
 
@@ -115,19 +115,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             urlInput.value = '';
 
             if (added) {
-                showStatus(chrome.i18n.getMessage('msg_add_success') || '添加成功');
+                showStatus(chrome.i18n.getMessage('msg_add_success') || 'Added successfully');
             } else {
-                showStatus(chrome.i18n.getMessage('msg_already_exists') || '网址已存在', 'error');
+                showStatus(chrome.i18n.getMessage('msg_already_exists') || 'URL already exists', 'error');
             }
 
             await loadBlacklist();
         } catch (error) {
-            console.error('添加到黑名单失败:', error);
-            showStatus(chrome.i18n.getMessage('msg_add_fail') || '添加失败', 'error');
+            console.error('Failed to add to blacklist:', error);
+            showStatus(chrome.i18n.getMessage('msg_add_fail') || 'Failed to add', 'error');
         }
     }
 
-    // 加载黑名单列表
+    // Load blacklist
     async function loadBlacklist() {
         const blacklistElement = document.getElementById('blacklist');
         const blacklistCountElement = document.getElementById('blacklist-count');
@@ -139,15 +139,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const blacklist = await BlackList.getAll();
 
-            // 更新计数
+            // Update count
             if (blacklistCountElement) {
-                blacklistCountElement.textContent = `${blacklist.length} ${chrome.i18n.getMessage('label_items') || '项'}`;
+                blacklistCountElement.textContent = `${blacklist.length} ${chrome.i18n.getMessage('label_items') || 'items'}`;
             }
 
             if (!blacklist || blacklist.length === 0) {
                 const emptyItem = document.createElement('div');
                 emptyItem.className = 'empty-list';
-                emptyItem.textContent = chrome.i18n.getMessage('msg_empty_blacklist') || '黑名单为空';
+                emptyItem.textContent = chrome.i18n.getMessage('msg_empty_blacklist') || 'Blacklist is empty';
                 blacklistElement.appendChild(emptyItem);
                 return;
             }
@@ -168,12 +168,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 blacklistElement.appendChild(li);
             });
         } catch (error) {
-            console.error('获取黑名单列表失败:', error);
-            blacklistElement.innerHTML = '<div class="empty-list" style="color:red;">加载黑名单失败</div>';
+            console.error('Failed to get blacklist:', error);
+            blacklistElement.innerHTML = '<div class="empty-list" style="color:red;">Failed to load blacklist</div>';
         }
     }
 
-    // 全选功能
+    // Select all function
     function selectAll() {
         const checkboxes = document.querySelectorAll('.blacklist-item-checkbox');
         checkboxes.forEach(checkbox => {
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 取消全选
+    // Deselect all
     function deselectAll() {
         const checkboxes = document.querySelectorAll('.blacklist-item-checkbox');
         checkboxes.forEach(checkbox => {
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 删除选中项
+    // Delete selected items
     async function deleteSelected() {
         const selectedUrls = Array.from(
             document.querySelectorAll('#blacklist li .blacklist-item-checkbox:checked')
@@ -199,30 +199,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
 
         if (selectedUrls.length === 0) {
-            showStatus(chrome.i18n.getMessage('msg_no_selection') || '请先选择要删除的项', 'error');
+            showStatus(chrome.i18n.getMessage('msg_no_selection') || 'Please select items to delete', 'error');
             return;
         }
 
         try {
-            // 使用批量删除功能
+            // Use batch delete function
             const successCount = await BlackList.removeBatch(selectedUrls);
 
             if (successCount > 0) {
                 showStatus(
                     chrome.i18n.getMessage('msg_delete_success').replace('{0}', successCount) ||
-                    `成功删除 ${successCount} 项`
+                    `Successfully deleted ${successCount} items`
                 );
                 await loadBlacklist();
             } else {
-                showStatus(chrome.i18n.getMessage('msg_delete_fail') || '删除失败', 'error');
+                showStatus(chrome.i18n.getMessage('msg_delete_fail') || 'Failed to delete', 'error');
             }
         } catch (error) {
-            console.error('批量删除失败:', error);
-            showStatus(chrome.i18n.getMessage('msg_delete_fail') || '删除失败', 'error');
+            console.error('Batch delete failed:', error);
+            showStatus(chrome.i18n.getMessage('msg_delete_fail') || 'Failed to delete', 'error');
         }
     }
 
-    // 导入黑名单
+    // Import blacklist
     async function importBlacklist() {
         const input = document.createElement('input');
         input.type = 'file';
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             try {
                 if (file.type !== 'text/plain') {
-                    showStatus(chrome.i18n.getMessage('msg_invalid_format') || '无效的文件格式', 'error');
+                    showStatus(chrome.i18n.getMessage('msg_invalid_format') || 'Invalid file format', 'error');
                     return;
                 }
 
@@ -250,21 +250,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (successCount > 0) {
                     showStatus(
                         chrome.i18n.getMessage('msg_import_success').replace('{0}', successCount) ||
-                        `成功导入 ${successCount} 项`
+                        `Successfully imported ${successCount} items`
                     );
                     await loadBlacklist();
                 } else {
-                    showStatus(chrome.i18n.getMessage('msg_import_fail') || '导入失败', 'error');
+                    showStatus(chrome.i18n.getMessage('msg_import_fail') || 'Import failed', 'error');
                 }
             } catch (error) {
-                console.error('导入文件失败:', error);
-                showStatus(chrome.i18n.getMessage('msg_import_fail') || '导入失败', 'error');
+                console.error('Failed to import file:', error);
+                showStatus(chrome.i18n.getMessage('msg_import_fail') || 'Import failed', 'error');
             }
         };
         input.click();
     }
 
-    // 导出黑名单
+    // Export blacklist
     async function exportBlacklist() {
         try {
             const blacklist = BlackList.getAll();
@@ -275,24 +275,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             a.download = 'blacklist.txt';
             a.click();
             URL.revokeObjectURL(url);
-            showStatus(chrome.i18n.getMessage('msg_export_success') || '导出成功');
+            showStatus(chrome.i18n.getMessage('msg_export_success') || 'Export successful');
         } catch (error) {
-            console.error('导出黑名单失败:', error);
-            showStatus(chrome.i18n.getMessage('msg_export_fail') || '导出失败', 'error');
+            console.error('Failed to export blacklist:', error);
+            showStatus(chrome.i18n.getMessage('msg_export_fail') || 'Export failed', 'error');
         }
     }
 
-    // 从书签导入
+    // Import from bookmarks
     async function importBookmark() {
         try {
             chrome.tabs.create({ url: 'bookmark.html' });
         } catch (error) {
-            console.error('打开书签页失败:', error);
-            showStatus(chrome.i18n.getMessage('msg_bookmark_fail') || '打开书签页失败', 'error');
+            console.error('Failed to open bookmark page:', error);
+            showStatus(chrome.i18n.getMessage('msg_bookmark_fail') || 'Failed to open bookmark page', 'error');
         }
     }
 
-    // 显示版本信息
+    // Display version information
     const versionElement = document.getElementById('version');
     if (versionElement) {
         const manifest = chrome.runtime.getManifest();

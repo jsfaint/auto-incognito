@@ -1,23 +1,23 @@
-let selectedNodes; // 保存选中的书签节点
+let selectedNodes; // Save selected bookmark nodes
 
 document.addEventListener('DOMContentLoaded', async () => {
-    selectedNodes = new Set(); // 初始化
+    selectedNodes = new Set(); // Initialize
     const bookmarkTree = await chrome.bookmarks.getTree();
     const treeContainer = document.getElementById('bookmarkTree');
 
-    // 国际化处理
+    // Internationalization handling
     document.getElementById('dialogTitle').textContent = chrome.i18n.getMessage("dialog_select_folder");
     document.getElementById('cancelImport').textContent = chrome.i18n.getMessage("button_cancel");
     document.getElementById('confirmImport').textContent = chrome.i18n.getMessage("button_import");
 
     const renderBookmarkTree = (node, container, level = 0, parent = null) => {
-        node.parent = parent; // 记录父节点
+        node.parent = parent; // Record parent node
 
         const div = document.createElement('div');
         div.className = 'bookmark-item';
         div.style.marginLeft = `${level * 20}px`;
 
-        // 添加折叠按钮
+        // Add collapse button
         const toggle = document.createElement('span');
         toggle.className = 'toggle';
         toggle.innerHTML = '▶';
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.appendChild(div);
         container.appendChild(childrenContainer);
 
-        // 折叠/展开逻辑
+        // Collapse/Expand logic
         toggle.addEventListener('click', () => {
             if (childrenContainer.style.display === 'none') {
                 childrenContainer.style.display = 'block';
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        // 自动展开第一级
+        // Auto expand first level
         if (level === 0) {
             childrenContainer.style.display = 'block';
             toggle.innerHTML = '▼';
@@ -63,17 +63,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         checkbox.addEventListener('change', () => {
             const checked = checkbox.checked;
 
-            // 处理当前节点
+            // Handle current node
             if (checked) {
                 selectedNodes.add(node);
             } else {
                 selectedNodes.delete(node);
             }
 
-            // 处理子节点
+            // Handle child nodes
             toggleChildren(node, checked);
 
-            // 更新父节点状态
+            // Update parent node state
             updateParentState(node);
         });
 
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             } catch (e) {
                 console.error("Import failed:", e);
-                alert("导入过程中发生错误");
+                alert("Error occurred during import");
             }
         }
     });
@@ -140,7 +140,7 @@ async function processBookmarks(selectedNodes) {
                         count++;
                     }
                 } catch (e) {
-                    // 忽略无效URL
+                    // Ignore invalid URLs
                 }
             }
             if (node.children) node.children.forEach(processNode);
@@ -158,7 +158,7 @@ async function processBookmarks(selectedNodes) {
     }
 }
 
-// 更新父节点的勾选状态
+// Update parent node checkbox state
 const updateParentState = (node) => {
     if (!node.parent) return;
 
@@ -173,25 +173,25 @@ const updateParentState = (node) => {
     }
 };
 
-// 递归勾选/取消子项
+// Recursively check/uncheck children
 const toggleChildren = (node, checked) => {
     if (node.children) {
         node.children.forEach(child => {
-            // 处理当前子节点
+            // Handle current child node
             if (checked) {
                 selectedNodes.add(child);
             } else {
                 selectedNodes.delete(child);
             }
 
-            // 更新子节点checkbox状态
+            // Update child node checkbox state
             const childCheckbox = document.querySelector(`#bookmark-${child.id}`);
             if (childCheckbox) {
                 childCheckbox.checked = checked;
                 childCheckbox.indeterminate = false;
             }
 
-            // 递归处理子节点的子节点
+            // Recursively handle child's children
             toggleChildren(child, checked);
         });
     }

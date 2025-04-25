@@ -6,23 +6,6 @@ try {
     console.log("Error importing scripts:", e);
 }
 
-// 保持service worker活跃的心跳
-const keepAlive = () => {
-    const keepAliveInterval = 20; // 20秒间隔
-    chrome.alarms.create('keepAlive', {
-        periodInMinutes: keepAliveInterval / 60
-    });
-};
-
-// 监听alarm事件
-chrome.alarms.onAlarm.addListener((alarm) => {
-    if (alarm.name === 'keepAlive') {
-        console.log('keepAlive', alarm);
-    }
-});
-
-keepAlive();
-
 const privateModeHandler = async (details) => {
     try {
         // if private option was disabled, skip it.
@@ -74,31 +57,21 @@ const privateModeHandler = async (details) => {
     }
 };
 
-chrome.webNavigation.onBeforeNavigate.addListener(privateModeHandler);
-
-const normalModeHandler = async (tabId, changeInfo, tab) => {
+const historyHandler = async (details) => {
     try {
-        if (changeInfo.url === undefined) {
-            return;
-        }
-
-        const url = changeInfo.url;
+        const url = details.url;
         const found = await BlackList.check(url);
         if (!found) {
             return;
         }
 
-        const removeHistoryListener = async (removedTabId) => {
-            if (removedTabId === tabId) {
-                await chrome.history.deleteUrl({ url: url });
-                chrome.tabs.onRemoved.removeListener(removeHistoryListener);
-            }
-        };
-
-        chrome.tabs.onRemoved.addListener(removeHistoryListener);
+        await chrome.history.deleteUrl({ url: url });
+        console.log('deleteUrl', url);
     } catch (e) {
-        console.log("normalModeHandler: ", e);
+        console.log("historyHandler: ", e);
     }
-};
+}
 
-chrome.tabs.onUpdated.addListener(normalModeHandler);
+chrome.webNavigation.onBeforeNavigate.addListener(privateModeHandler);
+
+chrome.history.onVisited.addListener(historyHandler);
