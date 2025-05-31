@@ -25,9 +25,6 @@ const privateModeHandler = async (details) => {
             return;
         }
 
-        // Close current tab
-        await chrome.tabs.remove(details.tabId);
-
         const state = await getWindowState();
         const windows = await chrome.windows.getAll();
         const incognitoWindow = windows.find(window => window.incognito);
@@ -52,6 +49,9 @@ const privateModeHandler = async (details) => {
                 state: await getWindowState() || 'maximized'
             });
         }
+
+        // Close current tab
+        await chrome.tabs.remove(details.tabId);
     } catch (e) {
         console.log("privateModeHandler: ", e);
     }
