@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Export blacklist
     async function exportBlacklist() {
         try {
-            const blacklist = BlackList.getAll();
+            const blacklist = await BlackList.getAll();
             const blob = new Blob([blacklist.join('\n')], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
