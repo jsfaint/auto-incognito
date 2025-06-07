@@ -46,13 +46,18 @@ const mockHistory = {
     deleteUrl: vi.fn()
 };
 
+const mockRuntime = {
+    id: "9527"
+};
+
 // 设置全局Chrome API模拟
 global.chrome = {
     storage: mockStorage,
     tabs: mockTabs,
     windows: mockWindows,
     webNavigation: mockWebNavigation,
-    history: mockHistory
+    history: mockHistory,
+    runtime: mockRuntime,
 };
 
 // 重置所有模拟功能
@@ -90,4 +95,4 @@ export function resetMocks() {
 
     // 重置history
     mockHistory.deleteUrl.mockResolvedValue();
-} 
+}
