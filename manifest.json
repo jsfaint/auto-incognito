@@ -1,40 +1,30 @@
 {
-    "manifest_version": 3,
-    "name": "__MSG_extension_name__",
-    "description": "__MSG_extension_description__",
-    "version": "0.8.5",
-    "default_locale": "en",
-    "permissions": [
-        "storage",
-        "tabs",
-        "history",
-        "webNavigation",
-        "bookmarks"
-    ],
-    "background": {
-        "service_worker": "background.js"
-    },
-    "action": {
-        "default_popup": "popup.html",
-        "default_icon": "icon.png"
-    },
-    "icons": {
-        "16": "icon.png",
-        "48": "icon.png",
-        "128": "icon.png"
-    },
-    "web_accessible_resources": [
-        {
-            "resources": [
-                "bookmark.html"
-            ],
-            "matches": [
-                "<all_urls>"
-            ]
-        }
-    ],
-    "options_ui": {
-        "page": "blacklist-manager.html",
-        "open_in_tab": true
+  "manifest_version": 3,
+  "name": "__MSG_extension_name__",
+  "description": "__MSG_extension_description__",
+  "version": "0.8.5",
+  "default_locale": "en",
+  "permissions": ["storage", "tabs", "history", "bookmarks"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["bookmark.html"],
+      "matches": ["<all_urls>"]
     }
+  ],
+  "options_ui": {
+    "page": "blacklist-manager.html",
+    "open_in_tab": true
+  }
 }

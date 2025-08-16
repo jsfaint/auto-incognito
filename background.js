@@ -6,9 +6,7 @@ try {
     console.log("Error importing scripts:", e);
 }
 
-const privateModeHandler = async (details) => {
-    if (details.frameId !== 0) return;
-
+const privateModeHandler = async (tabId, url) => {
     try {
         // if private option was disabled, skip it.
         const privateOption = await getPrivateOption();
@@ -16,12 +14,11 @@ const privateModeHandler = async (details) => {
             return;
         }
 
-        const tab = await chrome.tabs.get(details.tabId);
+        const tab = await chrome.tabs.get(tabId);
         if (tab === undefined || tab.incognito) {
             return;
         }
 
-        const url = details.url;
         const found = await BlackList.check(url);
         if (!found) {
             return;
@@ -53,7 +50,7 @@ const privateModeHandler = async (details) => {
         }
 
         // Close current tab
-        await chrome.tabs.remove(details.tabId);
+        await chrome.tabs.remove(tabId);
     } catch (e) {
         console.log("privateModeHandler: ", e);
     }
@@ -74,6 +71,9 @@ const historyHandler = async (details) => {
     }
 }
 
-chrome.webNavigation.onBeforeNavigate.addListener(privateModeHandler);
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (!changeInfo.url) return;
+    privateModeHandler(tabId, changeInfo.url);
+});
 
 chrome.history.onVisited.addListener(historyHandler);
