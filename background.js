@@ -7,6 +7,8 @@ try {
 }
 
 const privateModeHandler = async (details) => {
+    if (details.frameId !== 0) return;
+
     try {
         // if private option was disabled, skip it.
         const privateOption = await getPrivateOption();
