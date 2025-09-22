@@ -24,6 +24,11 @@ const privateModeHandler = async (tabId, url) => {
             return;
         }
 
+        // Check if it's a builtin page, if so, don't open in private mode
+        if (BlackList.isBuiltinPage(url)) {
+            return;
+        }
+
         const state = await getWindowState();
         const windows = await chrome.windows.getAll();
         const incognitoWindow = windows.find(window => window.incognito);
