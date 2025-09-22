@@ -2,9 +2,14 @@
   "manifest_version": 3,
   "name": "__MSG_extension_name__",
   "description": "__MSG_extension_description__",
-  "version": "0.8.6",
+  "version": "0.8.7",
   "default_locale": "en",
-  "permissions": ["storage", "tabs", "history", "bookmarks"],
+  "permissions": [
+    "storage",
+    "tabs",
+    "history",
+    "bookmarks"
+  ],
   "background": {
     "service_worker": "background.js"
   },
@@ -19,8 +24,12 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["bookmark.html"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "bookmark.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "options_ui": {
