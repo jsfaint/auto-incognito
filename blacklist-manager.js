@@ -84,49 +84,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Update blacklist count display
+    function updateBlacklistCount(count) {
+        const blacklistCountElement = document.getElementById('blacklist-count');
+        if (blacklistCountElement) {
+            blacklistCountElement.textContent = `${count} ${chrome.i18n.getMessage('label_items') || 'items'}`;
+        }
+    }
+
+    // Create empty list message element
+    function createEmptyListMessage(message) {
+        const emptyItem = document.createElement('div');
+        emptyItem.className = 'empty-list';
+        emptyItem.textContent = message;
+        return emptyItem;
+    }
+
+    // Create blacklist item DOM element
+    function createBlacklistItem(item) {
+        const li = document.createElement('li');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'blacklist-item-checkbox';
+
+        const urlSpan = document.createElement('span');
+        urlSpan.className = 'blacklist-item-content';
+        urlSpan.textContent = item;
+
+        li.appendChild(checkbox);
+        li.appendChild(urlSpan);
+        return li;
+    }
+
+    // Render blacklist items to DOM
+    function renderBlacklist(blacklist, blacklistElement) {
+        blacklistElement.innerHTML = '';
+        blacklist.forEach(item => {
+            blacklistElement.appendChild(createBlacklistItem(item));
+        });
+    }
+
     // Load blacklist
     async function loadBlacklist() {
         const blacklistElement = document.getElementById('blacklist');
-        const blacklistCountElement = document.getElementById('blacklist-count');
 
         if (!blacklistElement) return;
 
-        blacklistElement.innerHTML = '';
-
         try {
             const blacklist = await BlackList.getAll();
-
-            // Update count
-            if (blacklistCountElement) {
-                blacklistCountElement.textContent = `${blacklist.length} ${chrome.i18n.getMessage('label_items') || 'items'}`;
-            }
+            updateBlacklistCount(blacklist.length);
 
             if (!blacklist || blacklist.length === 0) {
-                const emptyItem = document.createElement('div');
-                emptyItem.className = 'empty-list';
-                emptyItem.textContent = chrome.i18n.getMessage('msg_empty_blacklist') || 'Blacklist is empty';
-                blacklistElement.appendChild(emptyItem);
+                blacklistElement.innerHTML = '';
+                blacklistElement.appendChild(
+                    createEmptyListMessage(chrome.i18n.getMessage('msg_empty_blacklist') || 'Blacklist is empty')
+                );
                 return;
             }
 
-            blacklist.forEach(item => {
-                const li = document.createElement('li');
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'blacklist-item-checkbox';
-
-                const urlSpan = document.createElement('span');
-                urlSpan.className = 'blacklist-item-content';
-                urlSpan.textContent = item;
-
-                li.appendChild(checkbox);
-                li.appendChild(urlSpan);
-                blacklistElement.appendChild(li);
-            });
+            renderBlacklist(blacklist, blacklistElement);
         } catch (error) {
             console.error('Failed to get blacklist:', error);
-            blacklistElement.innerHTML = '<div class="empty-list" style="color:red;">Failed to load blacklist</div>';
+            blacklistElement.innerHTML = '';
+            blacklistElement.appendChild(
+                createEmptyListMessage('Failed to load blacklist')
+            );
+            blacklistElement.querySelector('.empty-list').style.color = 'red';
         }
     }
 
