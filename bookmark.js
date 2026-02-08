@@ -1,7 +1,5 @@
-let selectedNodes; // Save selected bookmark nodes
-
 document.addEventListener('DOMContentLoaded', async () => {
-    selectedNodes = new Set(); // Initialize
+    const selectedNodes = new Set();
     const bookmarkTree = await chrome.bookmarks.getTree();
     const treeContainer = document.getElementById('bookmarkTree');
 
@@ -10,40 +8,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('cancelImport').textContent = chrome.i18n.getMessage("button_cancel");
     document.getElementById('confirmImport').textContent = chrome.i18n.getMessage("button_import");
 
-    const renderBookmarkTree = (node, container, level = 0, parent = null) => {
-        node.parent = parent; // Record parent node
-
-        const div = document.createElement('div');
-        div.className = 'bookmark-item';
-        div.style.marginLeft = `${level * 20}px`;
-
-        // Add collapse button
+    // Create toggle button for bookmark node
+    const createToggleBtn = (node) => {
         const toggle = document.createElement('span');
         toggle.className = 'toggle';
         toggle.innerHTML = '▶';
         toggle.style.cursor = 'pointer';
         toggle.style.marginRight = '5px';
         toggle.style.visibility = node.children ? 'visible' : 'hidden';
+        return toggle;
+    };
 
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = `bookmark-${node.id}`;
-
-        const label = document.createElement('label');
-        label.htmlFor = `bookmark-${node.id}`;
-        label.textContent = node.title || chrome.i18n.getMessage("root_folder");
-
-        const childrenContainer = document.createElement('div');
-        childrenContainer.className = 'children';
-        childrenContainer.style.display = 'none';
-
-        div.appendChild(toggle);
-        div.appendChild(checkbox);
-        div.appendChild(label);
-        container.appendChild(div);
-        container.appendChild(childrenContainer);
-
-        // Collapse/Expand logic
+    // Setup toggle collapse/expand behavior
+    const setupToggleBehavior = (toggle, childrenContainer) => {
         toggle.addEventListener('click', () => {
             if (childrenContainer.style.display === 'none') {
                 childrenContainer.style.display = 'block';
@@ -53,33 +30,114 @@ document.addEventListener('DOMContentLoaded', async () => {
                 toggle.innerHTML = '▶';
             }
         });
+    };
 
-        // Auto expand first level
-        if (level === 0) {
-            childrenContainer.style.display = 'block';
-            toggle.innerHTML = '▼';
-        }
+    // Create bookmark checkbox
+    const createBookmarkCheckbox = (node) => {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `bookmark-${node.id}`;
+        return checkbox;
+    };
 
+    // Setup checkbox change behavior
+    const setupCheckboxBehavior = (checkbox, node) => {
         checkbox.addEventListener('change', () => {
             const checked = checkbox.checked;
 
-            // Handle current node
             if (checked) {
                 selectedNodes.add(node);
             } else {
                 selectedNodes.delete(node);
             }
 
-            // Handle child nodes
-            toggleChildren(node, checked);
-
-            // Update parent node state
-            updateParentState(node);
+            toggleChildren(node, checked, selectedNodes);
+            updateParentState(node, selectedNodes);
         });
+    };
+
+    // Create bookmark label
+    const createBookmarkLabel = (node) => {
+        const label = document.createElement('label');
+        label.htmlFor = `bookmark-${node.id}`;
+        label.textContent = node.title || chrome.i18n.getMessage("root_folder");
+        return label;
+    };
+
+    // Create children container
+    const createChildrenContainer = () => {
+        const container = document.createElement('div');
+        container.className = 'children';
+        container.style.display = 'none';
+        return container;
+    };
+
+    // Render bookmark tree recursively
+    const renderBookmarkTree = (node, container, level = 0, parent = null) => {
+        node.parent = parent;
+
+        const div = document.createElement('div');
+        div.className = 'bookmark-item';
+        div.style.marginLeft = `${level * 20}px`;
+
+        const toggle = createToggleBtn(node);
+        const checkbox = createBookmarkCheckbox(node);
+        const label = createBookmarkLabel(node);
+        const childrenContainer = createChildrenContainer();
+
+        div.appendChild(toggle);
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        container.appendChild(div);
+        container.appendChild(childrenContainer);
+
+        setupToggleBehavior(toggle, childrenContainer);
+        setupCheckboxBehavior(checkbox, node);
+
+        if (level === 0) {
+            childrenContainer.style.display = 'block';
+            toggle.innerHTML = '▼';
+        }
 
         if (node.children) {
             node.children.forEach(child => {
                 renderBookmarkTree(child, childrenContainer, level + 1, node);
+            });
+        }
+    };
+
+    // Update parent node checkbox state
+    const updateParentState = (node, selectedNodes) => {
+        if (!node.parent) return;
+
+        const children = node.parent.children;
+        const selectedCount = children.filter(child => selectedNodes.has(child)).length;
+        const checkbox = document.querySelector(`#bookmark-${node.parent.id}`);
+
+        if (checkbox) {
+            checkbox.indeterminate = selectedCount > 0 && selectedCount < children.length;
+            checkbox.checked = selectedCount === children.length;
+            updateParentState(node.parent, selectedNodes);
+        }
+    };
+
+    // Recursively check/uncheck children
+    const toggleChildren = (node, checked, selectedNodes) => {
+        if (node.children) {
+            node.children.forEach(child => {
+                if (checked) {
+                    selectedNodes.add(child);
+                } else {
+                    selectedNodes.delete(child);
+                }
+
+                const childCheckbox = document.querySelector(`#bookmark-${child.id}`);
+                if (childCheckbox) {
+                    childCheckbox.checked = checked;
+                    childCheckbox.indeterminate = false;
+                }
+
+                toggleChildren(child, checked, selectedNodes);
             });
         }
     };
@@ -144,43 +202,4 @@ async function processBookmarks(selectedNodes) {
         console.error("Error processing bookmarks:", e);
         return 0;
     }
-}
-
-// Update parent node checkbox state
-const updateParentState = (node) => {
-    if (!node.parent) return;
-
-    const children = node.parent.children;
-    const selectedCount = children.filter(child => selectedNodes.has(child)).length;
-    const checkbox = document.querySelector(`#bookmark-${node.parent.id}`);
-
-    if (checkbox) {
-        checkbox.indeterminate = selectedCount > 0 && selectedCount < children.length;
-        checkbox.checked = selectedCount === children.length;
-        updateParentState(node.parent);
-    }
-};
-
-// Recursively check/uncheck children
-const toggleChildren = (node, checked) => {
-    if (node.children) {
-        node.children.forEach(child => {
-            // Handle current child node
-            if (checked) {
-                selectedNodes.add(child);
-            } else {
-                selectedNodes.delete(child);
-            }
-
-            // Update child node checkbox state
-            const childCheckbox = document.querySelector(`#bookmark-${child.id}`);
-            if (childCheckbox) {
-                childCheckbox.checked = checked;
-                childCheckbox.indeterminate = false;
-            }
-
-            // Recursively handle child's children
-            toggleChildren(child, checked);
-        });
-    }
-}; 
+} 
