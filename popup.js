@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initial password option
     const initPasswordOption = async () => {
-        const passwordOptionValue = await getPasswordOption();
+        const passwordOptionValue = await isPasswordOptionEnabled();
         if (passwordOptionValue === undefined) {
             const passwordValue = await getPassword();
             chkPasswordOption.checked = !!passwordValue;
@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await OptionInit();
 
     const passwordValue = await getPassword();
-    const passwordOptionValue = await getPasswordOption();
+    const passwordOptionValue = await isPasswordOptionEnabled();
 
     if (passwordOptionValue) {
         if (passwordValue.length == 0) {
