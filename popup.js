@@ -62,9 +62,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Initial Option
-    const OptionInit = async () => {
-        // Initial privateOption
+    // Initial private mode option
+    const initPrivateOption = async () => {
         const privateOption = await getPrivateOption();
         if (privateOption === undefined) {
             chkPrivate.checked = true;
@@ -72,33 +71,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             chkPrivate.checked = privateOption;
         }
+    };
 
-        // Initial passwordOption
+    // Initial password option
+    const initPasswordOption = async () => {
         const passwordOptionValue = await getPasswordOption();
         if (passwordOptionValue === undefined) {
             const passwordValue = await getPassword();
-
-            if (passwordValue) {
-                chkPasswordOption.checked = true;
-            } else {
-                chkPasswordOption.checked = false;
-            }
-
-            setPasswordOption(chkPasswordOption.checked)
+            chkPasswordOption.checked = !!passwordValue;
+            setPasswordOption(chkPasswordOption.checked);
         } else {
             chkPasswordOption.checked = passwordOptionValue;
         }
+    };
 
+    // Initial window state
+    const initWindowState = async () => {
         const windowStateSelect = document.getElementById('window-state');
-
-        // Initialize window state
         const windowState = await getWindowState();
         windowStateSelect.value = windowState || 'maximized';
 
-        // Add event listener
         windowStateSelect.addEventListener('change', async () => {
             await setWindowState(windowStateSelect.value);
         });
+    };
+
+    // Initialize all options
+    const OptionInit = async () => {
+        await initPrivateOption();
+        await initPasswordOption();
+        await initWindowState();
     };
 
     btnAddCurrentTab.addEventListener('click', async () => {
