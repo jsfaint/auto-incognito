@@ -3,31 +3,30 @@
 document.addEventListener('DOMContentLoaded', async () => {
     localizeHtmlPage();
 
+    // Password-related elements
     const chkPasswordOption = document.getElementById('password-option');
-
     const formPassword = document.getElementById('password-form');
-    const btnSetPassword = document.getElementById('set-password');
     const formVerifyPassword = document.getElementById('verify-password-form');
-
-    const chkPrivate = document.getElementById('in-private-mode');
-
-    const inputVerify = document.getElementById('verify-password');
-    const btnVerify = document.getElementById('verify-password-btn');
-
     const inputNewPassword = document.getElementById('new-password');
-
-    const btnAddCurrentTab = document.getElementById('addCurrentTabButton');
-    const btnAdd = document.getElementById('addButton');
-    const InputURL = document.getElementById('urlInput');
-
-    const formSetting = document.getElementById('setting-form');
+    const inputVerify = document.getElementById('verify-password');
+    const btnSetPassword = document.getElementById('set-password');
+    const btnVerify = document.getElementById('verify-password-btn');
     const btnClearPassword = document.getElementById('clear-password');
 
+    // Private mode elements
+    const chkPrivate = document.getElementById('in-private-mode');
+    const formSetting = document.getElementById('setting-form');
+
+    // Blacklist management elements
+    const InputURL = document.getElementById('urlInput');
+    const btnAdd = document.getElementById('addButton');
+    const btnAddCurrentTab = document.getElementById('addCurrentTabButton');
+    const btnManageBlacklist = document.getElementById('manageBlacklistButton');
+
+    // Import/Export elements
     const btnExport = document.getElementById('exportButton');
     const btnImport = document.getElementById('importButton');
-
     const btnImportBookmark = document.getElementById('importBookmarkButton');
-    const btnManageBlacklist = document.getElementById('manageBlacklistButton');
 
     const verifyPassword = async () => {
         const enteredPassword = inputVerify.value;
