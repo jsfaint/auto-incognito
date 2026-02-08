@@ -15,7 +15,7 @@ const privateModeHandler = async (tabId, url) => {
         }
 
         const tab = await chrome.tabs.get(tabId);
-        if (tab === undefined || tab.incognito) {
+        if (tab && tab.incognito) {
             return;
         }
 
@@ -34,7 +34,7 @@ const privateModeHandler = async (tabId, url) => {
         const incognitoWindow = windows.find(window => window.incognito);
 
         if (state === 'tabbed') {
-            if (incognitoWindow !== undefined && state === 'tabbed') {
+            if (incognitoWindow !== undefined) {
                 await chrome.tabs.create({
                     url: url,
                     windowId: incognitoWindow.id
