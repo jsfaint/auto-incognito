@@ -1,7 +1,7 @@
 "use strict";
 
 try {
-    importScripts('lib/blacklist.js', 'lib/private.js', 'lib/whitelist.js', 'lib/password.js');
+    importScripts('lib/utils.js', 'lib/blacklist.js', 'lib/private.js', 'lib/whitelist.js', 'lib/password.js');
 } catch (e) {
     console.error("Error importing scripts:", e);
 }

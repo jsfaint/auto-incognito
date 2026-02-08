@@ -1,22 +1,5 @@
 "use strict";
 
-const localizeHtmlPage = () => {
-    //Localize by replacing __MSG_***__ meta tags
-    var objects = document.getElementsByTagName('html');
-    for (var j = 0; j < objects.length; j++) {
-        var obj = objects[j];
-
-        var valStrH = obj.innerHTML.toString();
-        var valNewH = valStrH.replace(/__MSG_(\w+)__/g, function (match, v1) {
-            return v1 ? chrome.i18n.getMessage(v1) : "";
-        });
-
-        if (valNewH != valStrH) {
-            obj.innerHTML = valNewH;
-        }
-    }
-};
-
 document.addEventListener('DOMContentLoaded', async () => {
     localizeHtmlPage();
 
@@ -46,21 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnImportBookmark = document.getElementById('importBookmarkButton');
     const btnManageBlacklist = document.getElementById('manageBlacklistButton');
 
-    // Status message display
-    const showStatus = (message, type = 'success') => {
-        const statusElem = document.getElementById('statusMessage');
-        if (!statusElem) return;
-
-        statusElem.textContent = message;
-        statusElem.className = `status ${type}`;
-        statusElem.style.display = 'block';
-
-        // Auto hide after 3 seconds
-        setTimeout(() => {
-            statusElem.style.display = 'none';
-        }, 3000);
-    };
-
     const verifyPassword = async () => {
         const enteredPassword = inputVerify.value;
 
@@ -88,9 +56,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (await BlackList.add(url)) {
             // empty blacklist input
             InputURL.value = "";
-            showStatus(chrome.i18n.getMessage("msg_add_success") || '添加成功');
+            showStatusMessage(chrome.i18n.getMessage("msg_add_success") || '添加成功');
         } else {
-            showStatus(chrome.i18n.getMessage("msg_already_exists") || '网址已存在', 'error');
+            showStatusMessage(chrome.i18n.getMessage("msg_already_exists") || '网址已存在', 'error');
         }
     };
 
@@ -141,18 +109,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const url = tabs[0].url; // get url of current tab
-        const hostname = new URL(url).hostname; // extract the domain url
 
         if (findInWhitelist(url)) {
             return;
         }
 
-        const parts = hostname.split('.');
-        const tld = parts.pop();
-        const secondLevelDomain = parts.pop();
-        const primaryDomain = `${secondLevelDomain}.${tld}`;
-
-        if (await BlackList.add(primaryDomain)) {
+        const primaryDomain = extractPrimaryDomain(url);
+        if (primaryDomain && await BlackList.add(primaryDomain)) {
             chrome.tabs.reload(tabs[0].id);
         }
     });
@@ -254,27 +217,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Recursively process bookmark folders
         const processNode = (node) => {
             if (node.url) {
-                try {
-                    // Skip URLs in whitelist
-                    if (findInWhitelist(node.url)) {
-                        return;
-                    }
+                // Skip URLs in whitelist
+                if (findInWhitelist(node.url)) {
+                    return;
+                }
 
-                    // Extract primary domain
-                    const hostname = new URL(node.url).hostname;
-                    const parts = hostname.split('.');
-                    const tld = parts.pop();
-                    const secondLevelDomain = parts.pop();
-                    const primaryDomain = `${secondLevelDomain}.${tld}`;
+                // Extract primary domain
+                const primaryDomain = extractPrimaryDomain(node.url);
 
-                    // Only add URLs not in current blacklist
-                    if (primaryDomain && !currentBlacklist.includes(primaryDomain) && !newUrls.includes(primaryDomain)) {
-                        newUrls.push(primaryDomain);
-                        count++;
-                    }
-                } catch (e) {
-                    // Ignore invalid URLs
-                    console.warn('Unable to process URL:', node.url, e);
+                // Only add URLs not in current blacklist
+                if (primaryDomain && !currentBlacklist.includes(primaryDomain) && !newUrls.includes(primaryDomain)) {
+                    newUrls.push(primaryDomain);
+                    count++;
                 }
             }
 

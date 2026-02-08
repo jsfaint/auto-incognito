@@ -122,25 +122,13 @@ async function processBookmarks(selectedNodes) {
 
         const processNode = (node) => {
             if (node.url) {
-                try {
-                    if (findInWhitelist(node.url)) return;
+                if (findInWhitelist(node.url)) return;
 
-                    const hostname = new URL(node.url).hostname;
-                    if (!hostname) return;
+                const primaryDomain = extractPrimaryDomain(node.url);
 
-                    const parts = hostname.split('.');
-                    if (parts.length < 2) return;
-
-                    const tld = parts.pop();
-                    const secondLevelDomain = parts.pop();
-                    const primaryDomain = `${secondLevelDomain}.${tld}`;
-
-                    if (!blacklist.includes(primaryDomain) && !newDomains.includes(primaryDomain)) {
-                        newDomains.push(primaryDomain);
-                        count++;
-                    }
-                } catch (e) {
-                    // Ignore invalid URLs
+                if (primaryDomain && !blacklist.includes(primaryDomain) && !newDomains.includes(primaryDomain)) {
+                    newDomains.push(primaryDomain);
+                    count++;
                 }
             }
             if (node.children) node.children.forEach(processNode);

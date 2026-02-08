@@ -1,38 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // Internationalization handling
-    const localizeHtmlPage = () => {
-        //Localize by replacing __MSG_***__ meta tags
-        var objects = document.getElementsByTagName('html');
-        for (var j = 0; j < objects.length; j++) {
-            var obj = objects[j];
-
-            var valStrH = obj.innerHTML.toString();
-            var valNewH = valStrH.replace(/__MSG_(\w+)__/g, function (match, v1) {
-                return v1 ? chrome.i18n.getMessage(v1) : "";
-            });
-
-            if (valNewH != valStrH) {
-                obj.innerHTML = valNewH;
-            }
-        }
-    };
-
     localizeHtmlPage();
-
-    // Status message display
-    const showStatus = (message, type = 'success') => {
-        const statusElem = document.getElementById('statusMessage');
-        if (!statusElem) return;
-
-        statusElem.textContent = message;
-        statusElem.className = `status ${type}`;
-        statusElem.style.display = 'block';
-
-        // Auto hide after 3 seconds
-        setTimeout(() => {
-            statusElem.style.display = 'none';
-        }, 3000);
-    };
 
     // Back button
     const backButton = document.getElementById('backButton');
@@ -88,14 +56,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadBlacklist();
     } catch (error) {
         console.error('Failed to load blacklist:', error);
-        showStatus(chrome.i18n.getMessage('msg_load_fail') || 'Failed to load blacklist', 'error');
+        showStatusMessage(chrome.i18n.getMessage('msg_load_fail') || 'Failed to load blacklist', 'error');
     }
 
     // Add URL to blacklist
     async function addUrlToBlacklist() {
         const url = urlInput.value.trim();
         if (!url) {
-            showStatus(chrome.i18n.getMessage('msg_empty_url') || 'Please enter URL', 'error');
+            showStatusMessage(chrome.i18n.getMessage('msg_empty_url') || 'Please enter URL', 'error');
             return;
         }
 
@@ -104,9 +72,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             urlInput.value = '';
 
             if (added) {
-                showStatus(chrome.i18n.getMessage('msg_add_success') || 'Added successfully');
+                showStatusMessage(chrome.i18n.getMessage('msg_add_success') || 'Added successfully');
             } else {
-                showStatus(chrome.i18n.getMessage('msg_already_exists') || 'URL already exists', 'error');
+                showStatusMessage(chrome.i18n.getMessage('msg_already_exists') || 'URL already exists', 'error');
             }
 
             await loadBlacklist();
@@ -188,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
 
         if (selectedUrls.length === 0) {
-            showStatus(chrome.i18n.getMessage('msg_no_selection') || 'Please select items to delete', 'error');
+            showStatusMessage(chrome.i18n.getMessage('msg_no_selection') || 'Please select items to delete', 'error');
             return;
         }
 
@@ -197,17 +165,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const successCount = await BlackList.removeBatch(selectedUrls);
 
             if (successCount > 0) {
-                showStatus(
+                showStatusMessage(
                     chrome.i18n.getMessage('msg_delete_success').replace('{0}', successCount) ||
                     `Successfully deleted ${successCount} items`
                 );
                 await loadBlacklist();
             } else {
-                showStatus(chrome.i18n.getMessage('msg_delete_fail') || 'Failed to delete', 'error');
+                showStatusMessage(chrome.i18n.getMessage('msg_delete_fail') || 'Failed to delete', 'error');
             }
         } catch (error) {
             console.error('Batch delete failed:', error);
-            showStatus(chrome.i18n.getMessage('msg_delete_fail') || 'Failed to delete', 'error');
+            showStatusMessage(chrome.i18n.getMessage('msg_delete_fail') || 'Failed to delete', 'error');
         }
     }
 
@@ -222,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             try {
                 if (file.type !== 'text/plain') {
-                    showStatus(chrome.i18n.getMessage('msg_invalid_format') || 'Invalid file format', 'error');
+                    showStatusMessage(chrome.i18n.getMessage('msg_invalid_format') || 'Invalid file format', 'error');
                     return;
                 }
 
@@ -237,17 +205,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 if (successCount > 0) {
-                    showStatus(
+                    showStatusMessage(
                         chrome.i18n.getMessage('msg_import_success').replace('{0}', successCount) ||
                         `Successfully imported ${successCount} items`
                     );
                     await loadBlacklist();
                 } else {
-                    showStatus(chrome.i18n.getMessage('msg_import_fail') || 'Import failed', 'error');
+                    showStatusMessage(chrome.i18n.getMessage('msg_import_fail') || 'Import failed', 'error');
                 }
             } catch (error) {
                 console.error('Failed to import file:', error);
-                showStatus(chrome.i18n.getMessage('msg_import_fail') || 'Import failed', 'error');
+                showStatusMessage(chrome.i18n.getMessage('msg_import_fail') || 'Import failed', 'error');
             }
         };
         input.click();
@@ -264,10 +232,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             a.download = 'blacklist.txt';
             a.click();
             URL.revokeObjectURL(url);
-            showStatus(chrome.i18n.getMessage('msg_export_success') || 'Export successful');
+            showStatusMessage(chrome.i18n.getMessage('msg_export_success') || 'Export successful');
         } catch (error) {
             console.error('Failed to export blacklist:', error);
-            showStatus(chrome.i18n.getMessage('msg_export_fail') || 'Export failed', 'error');
+            showStatusMessage(chrome.i18n.getMessage('msg_export_fail') || 'Export failed', 'error');
         }
     }
 
@@ -277,7 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             chrome.tabs.create({ url: 'bookmark.html' });
         } catch (error) {
             console.error('Failed to open bookmark page:', error);
-            showStatus(chrome.i18n.getMessage('msg_bookmark_fail') || 'Failed to open bookmark page', 'error');
+            showStatusMessage(chrome.i18n.getMessage('msg_bookmark_fail') || 'Failed to open bookmark page', 'error');
         }
     }
 
