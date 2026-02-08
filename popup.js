@@ -210,44 +210,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         input.click();
     });
 
+    // Process bookmark node and collect domains
+    const processBookmarkNode = (node, currentBlacklist, newUrls) => {
+        if (node.url) {
+            if (findInWhitelist(node.url)) {
+                return;
+            }
+
+            const primaryDomain = extractPrimaryDomain(node.url);
+            if (primaryDomain && !currentBlacklist.includes(primaryDomain) && !newUrls.includes(primaryDomain)) {
+                newUrls.push(primaryDomain);
+            }
+        }
+
+        if (node.children) {
+            node.children.forEach(child => processBookmarkNode(child, currentBlacklist, newUrls));
+        }
+    };
+
+    // Extract unique domains from bookmark nodes
+    const extractDomainsFromBookmarks = (selectedNodes, currentBlacklist) => {
+        const newUrls = [];
+        selectedNodes.forEach(node => processBookmarkNode(node, currentBlacklist, newUrls));
+        return newUrls;
+    };
+
     // Import URLs from bookmarks to blacklist
     const importFromBookmarks = async (selectedNodes) => {
-        let count = 0;
         const currentBlacklist = await BlackList.getAll();
-        const newUrls = [];
+        const newUrls = extractDomainsFromBookmarks(selectedNodes, currentBlacklist);
 
-        // Recursively process bookmark folders
-        const processNode = (node) => {
-            if (node.url) {
-                // Skip URLs in whitelist
-                if (findInWhitelist(node.url)) {
-                    return;
-                }
-
-                // Extract primary domain
-                const primaryDomain = extractPrimaryDomain(node.url);
-
-                // Only add URLs not in current blacklist
-                if (primaryDomain && !currentBlacklist.includes(primaryDomain) && !newUrls.includes(primaryDomain)) {
-                    newUrls.push(primaryDomain);
-                    count++;
-                }
-            }
-
-            // Recursively process subfolders
-            if (node.children) {
-                node.children.forEach(processNode);
-            }
-        };
-
-        // Process selected nodes
-        processNode(selectedNodes);
-
-        // If new URLs found, add to blacklist
         if (newUrls.length > 0) {
             const newBlacklist = [...currentBlacklist, ...newUrls];
             await BlackList.set(newBlacklist);
-            alert(chrome.i18n.getMessage("alert_import_bookmark_success", [count]));
+            alert(chrome.i18n.getMessage("alert_import_bookmark_success", [newUrls.length]));
         } else {
             alert(chrome.i18n.getMessage("alert_no_new_records"));
         }
