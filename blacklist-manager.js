@@ -1,34 +1,23 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Loading blacklist management page...');
-
     // Internationalization handling
     const localizeHtmlPage = () => {
-        try {
-            //Localize by replacing __MSG_***__ meta tags
-            var objects = document.getElementsByTagName('html');
-            for (var j = 0; j < objects.length; j++) {
-                var obj = objects[j];
+        //Localize by replacing __MSG_***__ meta tags
+        var objects = document.getElementsByTagName('html');
+        for (var j = 0; j < objects.length; j++) {
+            var obj = objects[j];
 
-                var valStrH = obj.innerHTML.toString();
-                var valNewH = valStrH.replace(/__MSG_(\w+)__/g, function (match, v1) {
-                    return v1 ? chrome.i18n.getMessage(v1) : "";
-                });
+            var valStrH = obj.innerHTML.toString();
+            var valNewH = valStrH.replace(/__MSG_(\w+)__/g, function (match, v1) {
+                return v1 ? chrome.i18n.getMessage(v1) : "";
+            });
 
-                if (valNewH != valStrH) {
-                    obj.innerHTML = valNewH;
-                }
+            if (valNewH != valStrH) {
+                obj.innerHTML = valNewH;
             }
-        } catch (error) {
-            console.error('Internationalization failed:', error);
         }
     };
 
-    // Try to call localization function
-    try {
-        localizeHtmlPage();
-    } catch (error) {
-        console.error('Localization failed:', error);
-    }
+    localizeHtmlPage();
 
     // Status message display
     const showStatus = (message, type = 'success') => {
