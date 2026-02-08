@@ -1,65 +1,32 @@
 "use strict";
 
-const localizeHtmlPage = () => {
-    //Localize by replacing __MSG_***__ meta tags
-    var objects = document.getElementsByTagName('html');
-    for (var j = 0; j < objects.length; j++) {
-        var obj = objects[j];
-
-        var valStrH = obj.innerHTML.toString();
-        var valNewH = valStrH.replace(/__MSG_(\w+)__/g, function (match, v1) {
-            return v1 ? chrome.i18n.getMessage(v1) : "";
-        });
-
-        if (valNewH != valStrH) {
-            obj.innerHTML = valNewH;
-        }
-    }
-};
-
 document.addEventListener('DOMContentLoaded', async () => {
     localizeHtmlPage();
 
+    // Password-related elements
     const chkPasswordOption = document.getElementById('password-option');
-
     const formPassword = document.getElementById('password-form');
-    const btnSetPassword = document.getElementById('set-password');
     const formVerifyPassword = document.getElementById('verify-password-form');
-
-    const chkPrivate = document.getElementById('in-private-mode');
-
-    const inputVerify = document.getElementById('verify-password');
-    const btnVerify = document.getElementById('verify-password-btn');
-
     const inputNewPassword = document.getElementById('new-password');
-
-    const btnAddCurrentTab = document.getElementById('addCurrentTabButton');
-    const btnAdd = document.getElementById('addButton');
-    const InputURL = document.getElementById('urlInput');
-
-    const formSetting = document.getElementById('setting-form');
+    const inputVerify = document.getElementById('verify-password');
+    const btnSetPassword = document.getElementById('set-password');
+    const btnVerify = document.getElementById('verify-password-btn');
     const btnClearPassword = document.getElementById('clear-password');
 
-    const btnExport = document.getElementById('exportButton');
-    const btnImport = document.getElementById('importButton');
+    // Private mode elements
+    const chkPrivate = document.getElementById('in-private-mode');
+    const formSetting = document.getElementById('setting-form');
 
-    const btnImportBookmark = document.getElementById('importBookmarkButton');
+    // Blacklist management elements
+    const InputURL = document.getElementById('urlInput');
+    const btnAdd = document.getElementById('addButton');
+    const btnAddCurrentTab = document.getElementById('addCurrentTabButton');
     const btnManageBlacklist = document.getElementById('manageBlacklistButton');
 
-    // Status message display
-    const showStatus = (message, type = 'success') => {
-        const statusElem = document.getElementById('statusMessage');
-        if (!statusElem) return;
-
-        statusElem.textContent = message;
-        statusElem.className = `status ${type}`;
-        statusElem.style.display = 'block';
-
-        // Auto hide after 3 seconds
-        setTimeout(() => {
-            statusElem.style.display = 'none';
-        }, 3000);
-    };
+    // Import/Export elements
+    const btnExport = document.getElementById('exportButton');
+    const btnImport = document.getElementById('importButton');
+    const btnImportBookmark = document.getElementById('importBookmarkButton');
 
     const verifyPassword = async () => {
         const enteredPassword = inputVerify.value;
@@ -88,15 +55,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (await BlackList.add(url)) {
             // empty blacklist input
             InputURL.value = "";
-            showStatus(chrome.i18n.getMessage("msg_add_success") || '添加成功');
+            showStatusMessage(chrome.i18n.getMessage("msg_add_success") || '添加成功');
         } else {
-            showStatus(chrome.i18n.getMessage("msg_already_exists") || '网址已存在', 'error');
+            showStatusMessage(chrome.i18n.getMessage("msg_already_exists") || '网址已存在', 'error');
         }
     };
 
-    // Initial Option
-    const OptionInit = async () => {
-        // Initial privateOption
+    // Initial private mode option
+    const initPrivateOption = async () => {
         const privateOption = await getPrivateOption();
         if (privateOption === undefined) {
             chkPrivate.checked = true;
@@ -104,33 +70,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             chkPrivate.checked = privateOption;
         }
+    };
 
-        // Initial passwordOption
-        const passwordOptionValue = await getPasswordOption();
+    // Initial password option
+    const initPasswordOption = async () => {
+        const passwordOptionValue = await isPasswordOptionEnabled();
         if (passwordOptionValue === undefined) {
             const passwordValue = await getPassword();
-
-            if (passwordValue) {
-                chkPasswordOption.checked = true;
-            } else {
-                chkPasswordOption.checked = false;
-            }
-
-            setPasswordOption(chkPasswordOption.checked)
+            chkPasswordOption.checked = !!passwordValue;
+            setPasswordOption(chkPasswordOption.checked);
         } else {
             chkPasswordOption.checked = passwordOptionValue;
         }
+    };
 
+    // Initial window state
+    const initWindowState = async () => {
         const windowStateSelect = document.getElementById('window-state');
-
-        // Initialize window state
         const windowState = await getWindowState();
         windowStateSelect.value = windowState || 'maximized';
 
-        // Add event listener
         windowStateSelect.addEventListener('change', async () => {
             await setWindowState(windowStateSelect.value);
         });
+    };
+
+    // Initialize all options
+    const OptionInit = async () => {
+        await initPrivateOption();
+        await initPasswordOption();
+        await initWindowState();
     };
 
     btnAddCurrentTab.addEventListener('click', async () => {
@@ -141,18 +110,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const url = tabs[0].url; // get url of current tab
-        const hostname = new URL(url).hostname; // extract the domain url
 
         if (findInWhitelist(url)) {
             return;
         }
 
-        const parts = hostname.split('.');
-        const tld = parts.pop();
-        const secondLevelDomain = parts.pop();
-        const primaryDomain = `${secondLevelDomain}.${tld}`;
-
-        if (await BlackList.add(primaryDomain)) {
+        const primaryDomain = extractPrimaryDomain(url);
+        if (primaryDomain && await BlackList.add(primaryDomain)) {
             chrome.tabs.reload(tabs[0].id);
         }
     });
@@ -245,53 +209,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         input.click();
     });
 
+    // Process bookmark node and collect domains
+    const processBookmarkNode = (node, currentBlacklist, newUrls) => {
+        if (node.url) {
+            if (findInWhitelist(node.url)) {
+                return;
+            }
+
+            const primaryDomain = extractPrimaryDomain(node.url);
+            if (primaryDomain && !currentBlacklist.includes(primaryDomain) && !newUrls.includes(primaryDomain)) {
+                newUrls.push(primaryDomain);
+            }
+        }
+
+        if (node.children) {
+            node.children.forEach(child => processBookmarkNode(child, currentBlacklist, newUrls));
+        }
+    };
+
+    // Extract unique domains from bookmark nodes
+    const extractDomainsFromBookmarks = (selectedNodes, currentBlacklist) => {
+        const newUrls = [];
+        selectedNodes.forEach(node => processBookmarkNode(node, currentBlacklist, newUrls));
+        return newUrls;
+    };
+
     // Import URLs from bookmarks to blacklist
     const importFromBookmarks = async (selectedNodes) => {
-        let count = 0;
         const currentBlacklist = await BlackList.getAll();
-        const newUrls = [];
+        const newUrls = extractDomainsFromBookmarks(selectedNodes, currentBlacklist);
 
-        // Recursively process bookmark folders
-        const processNode = (node) => {
-            if (node.url) {
-                try {
-                    // Skip URLs in whitelist
-                    if (findInWhitelist(node.url)) {
-                        return;
-                    }
-
-                    // Extract primary domain
-                    const hostname = new URL(node.url).hostname;
-                    const parts = hostname.split('.');
-                    const tld = parts.pop();
-                    const secondLevelDomain = parts.pop();
-                    const primaryDomain = `${secondLevelDomain}.${tld}`;
-
-                    // Only add URLs not in current blacklist
-                    if (primaryDomain && !currentBlacklist.includes(primaryDomain) && !newUrls.includes(primaryDomain)) {
-                        newUrls.push(primaryDomain);
-                        count++;
-                    }
-                } catch (e) {
-                    // Ignore invalid URLs
-                    console.warn('Unable to process URL:', node.url, e);
-                }
-            }
-
-            // Recursively process subfolders
-            if (node.children) {
-                node.children.forEach(processNode);
-            }
-        };
-
-        // Process selected nodes
-        processNode(selectedNodes);
-
-        // If new URLs found, add to blacklist
         if (newUrls.length > 0) {
             const newBlacklist = [...currentBlacklist, ...newUrls];
             await BlackList.set(newBlacklist);
-            alert(chrome.i18n.getMessage("alert_import_bookmark_success", [count]));
+            alert(chrome.i18n.getMessage("alert_import_bookmark_success", [newUrls.length]));
         } else {
             alert(chrome.i18n.getMessage("alert_no_new_records"));
         }
@@ -307,7 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await OptionInit();
 
     const passwordValue = await getPassword();
-    const passwordOptionValue = await getPasswordOption();
+    const passwordOptionValue = await isPasswordOptionEnabled();
 
     if (passwordOptionValue) {
         if (passwordValue.length == 0) {

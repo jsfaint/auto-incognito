@@ -5,7 +5,7 @@ import { resetMocks } from '../mocks/chrome-api.js';
 const mockChrome = global.chrome;
 
 // 导入被测试的模块
-let getPassword, setPassword, getPasswordOption, setPasswordOption;
+let getPassword, setPassword, isPasswordOptionEnabled, setPasswordOption;
 
 describe('Password 模块', () => {
     // 在每个测试前重置模拟
@@ -16,7 +16,7 @@ describe('Password 模块', () => {
         const passwordModule = require('../../lib/password.js');
         getPassword = passwordModule.getPassword;
         setPassword = passwordModule.setPassword;
-        getPasswordOption = passwordModule.getPasswordOption;
+        isPasswordOptionEnabled = passwordModule.isPasswordOptionEnabled;
         setPasswordOption = passwordModule.setPasswordOption;
     });
 
@@ -59,26 +59,26 @@ describe('Password 模块', () => {
         expect(mockChrome.storage.sync.set).toHaveBeenCalled();
     });
 
-    test('getPasswordOption应返回undefined当存储中没有passwordOption', async () => {
+    test('isPasswordOptionEnabled应返回undefined当存储中没有passwordOption', async () => {
         // 模拟chrome.storage.sync.get返回空对象
         mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             if (callback) callback({});
             return Promise.resolve({});
         });
 
-        const result = await getPasswordOption();
+        const result = await isPasswordOptionEnabled();
         expect(result).toBeUndefined();
         expect(mockChrome.storage.sync.get).toHaveBeenCalled();
     });
 
-    test('getPasswordOption应返回存储中的passwordOption值', async () => {
+    test('isPasswordOptionEnabled应返回存储中的passwordOption值', async () => {
         // 模拟chrome.storage.sync.get返回包含passwordOption的对象
         mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             if (callback) callback({ passwordOption: true });
             return Promise.resolve({ passwordOption: true });
         });
 
-        const result = await getPasswordOption();
+        const result = await isPasswordOptionEnabled();
         expect(result).toBe(true);
         expect(mockChrome.storage.sync.get).toHaveBeenCalled();
     });

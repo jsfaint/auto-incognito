@@ -1,9 +1,9 @@
 "use strict";
 
 try {
-    importScripts('lib/blacklist.js', 'lib/private.js', 'lib/whitelist.js', 'lib/password.js');
+    importScripts('lib/utils.js', 'lib/blacklist.js', 'lib/private.js', 'lib/whitelist.js', 'lib/password.js');
 } catch (e) {
-    console.log("Error importing scripts:", e);
+    console.error("Error importing scripts:", e);
 }
 
 const privateModeHandler = async (tabId, url) => {
@@ -15,7 +15,7 @@ const privateModeHandler = async (tabId, url) => {
         }
 
         const tab = await chrome.tabs.get(tabId);
-        if (tab === undefined || tab.incognito) {
+        if (tab && tab.incognito) {
             return;
         }
 
@@ -34,7 +34,7 @@ const privateModeHandler = async (tabId, url) => {
         const incognitoWindow = windows.find(window => window.incognito);
 
         if (state === 'tabbed') {
-            if (incognitoWindow !== undefined && state === 'tabbed') {
+            if (incognitoWindow !== undefined) {
                 await chrome.tabs.create({
                     url: url,
                     windowId: incognitoWindow.id
@@ -57,7 +57,7 @@ const privateModeHandler = async (tabId, url) => {
         // Close current tab
         await chrome.tabs.remove(tabId);
     } catch (e) {
-        console.log("privateModeHandler: ", e);
+        console.error("privateModeHandler:", e);
     }
 };
 
@@ -72,7 +72,7 @@ const historyHandler = async (details) => {
         await chrome.history.deleteUrl({ url: url });
         console.log('deleteUrl', url);
     } catch (e) {
-        console.log("historyHandler: ", e);
+        console.error("historyHandler:", e);
     }
 }
 
