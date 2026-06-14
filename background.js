@@ -50,7 +50,7 @@ const privateModeHandler = async (tabId, url) => {
             await chrome.windows.create({
                 url: url,
                 incognito: true,
-                state: await getWindowState() || 'maximized'
+                state: state || 'maximized'
             });
         }
 

@@ -105,6 +105,19 @@ describe('BlackList 模块', () => {
         expect(result).toBe(false);
     });
 
+    test('check方法不再对内置页面特殊处理，仅依据hostname匹配黑名单', async () => {
+        // check() 的职责已收敛为"URL hostname 是否匹配黑名单"，
+        // 内置页面是否跳过由调用方（privateModeHandler 的 isBuiltinPage 检查）决定。
+        // 内置页面 URL 的 hostname 是扩展 ID（chrome.runtime.id），不会出现在黑名单中，
+        // 因此应返回 false。此测试锁定该契约，防止 isBuiltinPage 检查被重新塞回 check()。
+        const blacklist = ['example.com'];
+        mockChrome.storage.sync.get.mockResolvedValue({ blacklist });
+
+        const builtinUrl = `chrome-extension://${mockChrome.runtime.id}/blacklist-manager.html`;
+        const result = await BlackList.check(builtinUrl);
+        expect(result).toBe(false);
+    });
+
     test('set方法应正确设置blacklist', async () => {
         const newBlacklist = ['domain1.com', 'domain2.com'];
         mockChrome.storage.sync.set.mockResolvedValue();
