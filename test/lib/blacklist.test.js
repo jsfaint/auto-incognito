@@ -105,6 +105,32 @@ describe('BlackList 模块', () => {
         expect(result).toBe(false);
     });
 
+    test('check方法不应将子串模式误匹配到不相关域名', async () => {
+        // 回归测试：旧逻辑 hostname.includes(pattern) 导致 "x.com" 误中 "realibox.com"
+        mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['x.com'] });
+
+        const result = await BlackList.check('https://realibox.com/path');
+        expect(result).toBe(false);
+    });
+
+    test('check方法应正确匹配子域名', async () => {
+        mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['x.com'] });
+
+        expect(await BlackList.check('https://www.x.com/path')).toBe(true);
+        expect(await BlackList.check('https://mail.x.com/path')).toBe(true);
+    });
+
+    test('check方法应精确匹配域名并拒绝前缀重名域名', async () => {
+        mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['google.com'] });
+
+        // 精确命中
+        expect(await BlackList.check('https://google.com/path')).toBe(true);
+        // 二级子域名命中
+        expect(await BlackList.check('https://mail.google.com/path')).toBe(true);
+        // 前缀重名域名不应误匹配（旧逻辑会误中）
+        expect(await BlackList.check('https://fakegoogle.com/path')).toBe(false);
+    });
+
     test('check方法不再对内置页面特殊处理，仅依据hostname匹配黑名单', async () => {
         // check() 的职责已收敛为"URL hostname 是否匹配黑名单"，
         // 内置页面是否跳过由调用方（privateModeHandler 的 isBuiltinPage 检查）决定。
