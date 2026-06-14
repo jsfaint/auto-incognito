@@ -173,30 +173,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert(chrome.i18n.getMessage("info_clear_password"));
     });
 
-    const exportBlacklist = async () => {
-        const blacklist = await BlackList.getAll();
-        const blob = new Blob([blacklist.join('\n')], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'blacklist.txt';
-        a.click();
-        URL.revokeObjectURL(url);
-    };
-
+    // 导入/导出/书签导入按钮：调用 lib/blacklist-io.js 的共享实现
     btnExport.addEventListener("click", exportBlacklist);
-
-    const importBlacklist = async (file) => {
-        const text = await file.text();
-        const lines = text.split('\n').filter(line => line.trim());
-        const whitelistFiltered = lines.filter(url => !findInWhitelist(url));
-
-        const currentBlacklist = await BlackList.getAll();
-        const newBlacklist = [...new Set([...currentBlacklist, ...whitelistFiltered])];
-
-        await BlackList.set(newBlacklist);
-        alert(chrome.i18n.getMessage("alert_import_success", [whitelistFiltered.length]));
-    };
 
     btnImport.addEventListener('click', () => {
         const input = document.createElement('input');
@@ -205,7 +183,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         input.onchange = (e) => {
             const file = e.target.files[0];
             if (file?.type === 'text/plain') {
-                importBlacklist(file);
+                importBlacklistFromFile(file).then(count => {
+                    alert(chrome.i18n.getMessage("alert_import_success", [count]));
+                });
             } else {
                 alert(chrome.i18n.getMessage("alert_invalid_file"));
             }
@@ -213,50 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         input.click();
     });
 
-    // Process bookmark node and collect domains
-    const processBookmarkNode = (node, currentBlacklist, newUrls) => {
-        if (node.url) {
-            if (findInWhitelist(node.url)) {
-                return;
-            }
-
-            const primaryDomain = extractPrimaryDomain(node.url);
-            if (primaryDomain && !currentBlacklist.includes(primaryDomain) && !newUrls.includes(primaryDomain)) {
-                newUrls.push(primaryDomain);
-            }
-        }
-
-        if (node.children) {
-            node.children.forEach(child => processBookmarkNode(child, currentBlacklist, newUrls));
-        }
-    };
-
-    // Extract unique domains from bookmark nodes
-    const extractDomainsFromBookmarks = (selectedNodes, currentBlacklist) => {
-        const newUrls = [];
-        selectedNodes.forEach(node => processBookmarkNode(node, currentBlacklist, newUrls));
-        return newUrls;
-    };
-
-    // Import URLs from bookmarks to blacklist
-    const importFromBookmarks = async (selectedNodes) => {
-        const currentBlacklist = await BlackList.getAll();
-        const newUrls = extractDomainsFromBookmarks(selectedNodes, currentBlacklist);
-
-        if (newUrls.length > 0) {
-            const newBlacklist = [...currentBlacklist, ...newUrls];
-            await BlackList.set(newBlacklist);
-            alert(chrome.i18n.getMessage("alert_import_bookmark_success", [newUrls.length]));
-        } else {
-            alert(chrome.i18n.getMessage("alert_no_new_records"));
-        }
-    };
-
-    btnImportBookmark.addEventListener('click', () => {
-        chrome.tabs.create({
-            url: chrome.runtime.getURL('bookmark.html')
-        });
-    });
+    btnImportBookmark.addEventListener('click', openBookmarkImport);
 
     // Start from here
     const passwordOptionValue = await OptionInit();

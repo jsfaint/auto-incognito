@@ -45,10 +45,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     const exportButton = document.getElementById('exportButton');
     const importBookmarkButton = document.getElementById('importBookmarkButton');
 
+    // 导入/导出/书签导入：调用 lib/blacklist-io.js 的共享实现，并补充页面级状态提示
     if (importButton && exportButton && importBookmarkButton) {
-        importButton.addEventListener('click', importBlacklist);
-        exportButton.addEventListener('click', exportBlacklist);
-        importBookmarkButton.addEventListener('click', importBookmark);
+        importButton.addEventListener('click', async () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.txt';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                try {
+                    if (file.type !== 'text/plain') {
+                        showStatusMessage(chrome.i18n.getMessage('msg_invalid_format') || 'Invalid file format', 'error');
+                        return;
+                    }
+
+                    const count = await importBlacklistFromFile(file);
+                    if (count > 0) {
+                        showStatusMessage(
+                            chrome.i18n.getMessage('msg_import_success').replace('{0}', count) ||
+                            `Successfully imported ${count} items`
+                        );
+                        await loadBlacklist();
+                    } else {
+                        showStatusMessage(chrome.i18n.getMessage('msg_import_fail') || 'Import failed', 'error');
+                    }
+                } catch (error) {
+                    console.error('Failed to import file:', error);
+                    showStatusMessage(chrome.i18n.getMessage('msg_import_fail') || 'Import failed', 'error');
+                }
+            };
+            input.click();
+        });
+
+        exportButton.addEventListener('click', async () => {
+            try {
+                await exportBlacklist();
+                showStatusMessage(chrome.i18n.getMessage('msg_export_success') || 'Export successful');
+            } catch (error) {
+                console.error('Failed to export blacklist:', error);
+                showStatusMessage(chrome.i18n.getMessage('msg_export_fail') || 'Export failed', 'error');
+            }
+        });
+
+        importBookmarkButton.addEventListener('click', () => {
+            try {
+                openBookmarkImport();
+            } catch (error) {
+                console.error('Failed to open bookmark page:', error);
+                showStatusMessage(chrome.i18n.getMessage('msg_bookmark_fail') || 'Failed to open bookmark page', 'error');
+            }
+        });
     }
 
     // Initialize blacklist display
@@ -200,76 +248,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             console.error('Batch delete failed:', error);
             showStatusMessage(chrome.i18n.getMessage('msg_delete_fail') || 'Failed to delete', 'error');
-        }
-    }
-
-    // Import blacklist
-    async function importBlacklist() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.txt';
-        input.onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            try {
-                if (file.type !== 'text/plain') {
-                    showStatusMessage(chrome.i18n.getMessage('msg_invalid_format') || 'Invalid file format', 'error');
-                    return;
-                }
-
-                const text = await file.text();
-                const lines = text.split('\n').filter(line => line.trim());
-
-                let successCount = 0;
-                for (const url of lines) {
-                    if (await BlackList.add(url)) {
-                        successCount++;
-                    }
-                }
-
-                if (successCount > 0) {
-                    showStatusMessage(
-                        chrome.i18n.getMessage('msg_import_success').replace('{0}', successCount) ||
-                        `Successfully imported ${successCount} items`
-                    );
-                    await loadBlacklist();
-                } else {
-                    showStatusMessage(chrome.i18n.getMessage('msg_import_fail') || 'Import failed', 'error');
-                }
-            } catch (error) {
-                console.error('Failed to import file:', error);
-                showStatusMessage(chrome.i18n.getMessage('msg_import_fail') || 'Import failed', 'error');
-            }
-        };
-        input.click();
-    }
-
-    // Export blacklist
-    async function exportBlacklist() {
-        try {
-            const blacklist = await BlackList.getAll();
-            const blob = new Blob([blacklist.join('\n')], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'blacklist.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-            showStatusMessage(chrome.i18n.getMessage('msg_export_success') || 'Export successful');
-        } catch (error) {
-            console.error('Failed to export blacklist:', error);
-            showStatusMessage(chrome.i18n.getMessage('msg_export_fail') || 'Export failed', 'error');
-        }
-    }
-
-    // Import from bookmarks
-    async function importBookmark() {
-        try {
-            chrome.tabs.create({ url: 'bookmark.html' });
-        } catch (error) {
-            console.error('Failed to open bookmark page:', error);
-            showStatusMessage(chrome.i18n.getMessage('msg_bookmark_fail') || 'Failed to open bookmark page', 'error');
         }
     }
 

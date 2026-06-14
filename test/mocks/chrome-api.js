@@ -24,6 +24,7 @@ const mockStorage = {
 
 const mockTabs = {
     get: vi.fn(),
+    create: vi.fn(),
     remove: vi.fn(),
     onRemoved: {
         addListener: vi.fn(),
@@ -52,7 +53,8 @@ const mockHistory = {
 };
 
 const mockRuntime = {
-    id: "9527"
+    id: "9527",
+    getURL: vi.fn()
 };
 
 // 设置全局Chrome API模拟
@@ -92,7 +94,11 @@ export function resetMocks() {
 
     // 重置tabs
     mockTabs.get.mockResolvedValue({});
+    mockTabs.create.mockResolvedValue({});
     mockTabs.remove.mockResolvedValue();
+
+    // 重置runtime
+    mockRuntime.getURL.mockImplementation((path) => `chrome-extension://9527/${path}`);
 
     // 重置windows
     mockWindows.create.mockResolvedValue({});

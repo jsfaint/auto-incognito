@@ -170,36 +170,37 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     });
-});
 
-async function processBookmarks(selectedNodes) {
-    try {
-        let count = 0;
-        const blacklist = await BlackList.getAll();
-        const newDomains = [];
+    // 处理选中的书签节点：提取主域名并合并入黑名单
+    const processBookmarks = async (selectedNodes) => {
+        try {
+            let count = 0;
+            const blacklist = await BlackList.getAll();
+            const newDomains = [];
 
-        const processNode = (node) => {
-            if (node.url) {
-                if (findInWhitelist(node.url)) return;
+            const processNode = (node) => {
+                if (node.url) {
+                    if (findInWhitelist(node.url)) return;
 
-                const primaryDomain = extractPrimaryDomain(node.url);
+                    const primaryDomain = extractPrimaryDomain(node.url);
 
-                if (primaryDomain && !blacklist.includes(primaryDomain) && !newDomains.includes(primaryDomain)) {
-                    newDomains.push(primaryDomain);
-                    count++;
+                    if (primaryDomain && !blacklist.includes(primaryDomain) && !newDomains.includes(primaryDomain)) {
+                        newDomains.push(primaryDomain);
+                        count++;
+                    }
                 }
+                if (node.children) node.children.forEach(processNode);
+            };
+
+            selectedNodes.forEach(processNode);
+
+            if (count > 0) {
+                await BlackList.set([...blacklist, ...newDomains]);
             }
-            if (node.children) node.children.forEach(processNode);
-        };
-
-        selectedNodes.forEach(processNode);
-
-        if (count > 0) {
-            await BlackList.set([...blacklist, ...newDomains]);
+            return count;
+        } catch (e) {
+            console.error("Error processing bookmarks:", e);
+            return 0;
         }
-        return count;
-    } catch (e) {
-        console.error("Error processing bookmarks:", e);
-        return 0;
-    }
-} 
+    };
+}); 
