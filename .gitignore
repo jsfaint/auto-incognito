@@ -18,3 +18,5 @@ coverage/
 # Documentation and templates
 xnotes/
 docs/
+.trellis/
+.opencode/
