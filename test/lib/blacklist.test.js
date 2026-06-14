@@ -1,20 +1,21 @@
 import { describe, test, expect, beforeEach, vi, mock } from 'bun:test';
 import { resetMocks } from '../mocks/chrome-api.js';
 
-// 导入被测试的模块
+// Import the module under test
 const mockChrome = global.chrome;
 
-// 手动导入BlackList对象
+// Manually import the BlackList object
 let BlackList;
 let _onChangedHandler;
 
-describe('BlackList 模块', () => {
-    // 在每个测试前重置模拟并清空内存缓存
+describe('BlackList module', () => {
+    // Reset mocks and clear the in-memory cache before each test
     beforeEach(() => {
         resetMocks();
 
-        // 清除模块缓存使模块重新执行：_blacklistCache 自然重置为 null，
-        // onChanged 监听器重新注册（clearAllMocks 会清空调用记录）。
+        // Clear the module cache so the module re-executes: _blacklistCache resets
+        // to null naturally, and the onChanged listener re-registers
+        // (clearAllMocks wipes the call recordings).
         delete require.cache[require.resolve('../../lib/blacklist.js')];
 
         const blacklistModule = require('../../lib/blacklist.js');
@@ -22,7 +23,7 @@ describe('BlackList 模块', () => {
         _onChangedHandler = blacklistModule._onChangedHandler;
     });
 
-    test('getAll方法应返回空数组当存储中没有blacklist', async () => {
+    test('getAll should return an empty array when storage has no blacklist', async () => {
         mockChrome.storage.sync.get.mockResolvedValue({});
 
         const result = await BlackList.getAll();
@@ -30,7 +31,7 @@ describe('BlackList 模块', () => {
         expect(mockChrome.storage.sync.get).toHaveBeenCalledWith(['blacklist']);
     });
 
-    test('getAll方法应返回存储中的blacklist数组', async () => {
+    test('getAll should return the blacklist array from storage', async () => {
         const mockBlacklist = ['example.com', 'test.com'];
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: mockBlacklist });
 
@@ -39,7 +40,7 @@ describe('BlackList 模块', () => {
         expect(mockChrome.storage.sync.get).toHaveBeenCalledWith(['blacklist']);
     });
 
-    test('add方法应添加新URL到blacklist', async () => {
+    test('add should add a new URL to the blacklist', async () => {
         const existingBlacklist = ['example.com'];
         const newUrl = 'test.com';
         const expectedBlacklist = [...existingBlacklist, newUrl];
@@ -52,7 +53,7 @@ describe('BlackList 模块', () => {
         expect(mockChrome.storage.sync.set).toHaveBeenCalledWith({ blacklist: expectedBlacklist });
     });
 
-    test('add方法如果URL已存在应返回false', async () => {
+    test('add should return false if the URL already exists', async () => {
         const existingUrl = 'example.com';
         const existingBlacklist = [existingUrl];
 
@@ -63,7 +64,7 @@ describe('BlackList 模块', () => {
         expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
     });
 
-    test('remove方法应从blacklist中移除指定URL', async () => {
+    test('remove should remove the given URL from the blacklist', async () => {
         const url1 = 'example.com';
         const url2 = 'test.com';
         const existingBlacklist = [url1, url2];
@@ -77,7 +78,7 @@ describe('BlackList 模块', () => {
         expect(mockChrome.storage.sync.set).toHaveBeenCalledWith({ blacklist: expectedBlacklist });
     });
 
-    test('remove方法如果URL不存在应返回false', async () => {
+    test('remove should return false if the URL does not exist', async () => {
         const existingBlacklist = ['example.com'];
         const nonExistingUrl = 'nonexisting.com';
 
@@ -88,54 +89,55 @@ describe('BlackList 模块', () => {
         expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
     });
 
-    test('check方法应正确检测URL是否在黑名单中', async () => {
+    test('check should correctly detect whether a URL is in the blacklist', async () => {
         const blacklist = ['example.com', 'test.com'];
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist });
 
-        // 匹配的URL
+        // Matching URL
         let result = await BlackList.check('https://example.com/path');
         expect(result).toBe(true);
 
-        // 子域名应该也能匹配
+        // Subdomains should also match
         result = await BlackList.check('https://sub.example.com/path');
         expect(result).toBe(true);
 
-        // 不匹配的URL
+        // Non-matching URL
         result = await BlackList.check('https://other.com/path');
         expect(result).toBe(false);
     });
 
-    test('check方法不应将子串模式误匹配到不相关域名', async () => {
-        // 回归测试：旧逻辑 hostname.includes(pattern) 导致 "x.com" 误中 "realibox.com"
+    test('check should not falsely match a substring pattern against an unrelated domain', async () => {
+        // Regression test: the old hostname.includes(pattern) logic let "x.com" falsely match "realibox.com"
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['x.com'] });
 
         const result = await BlackList.check('https://realibox.com/path');
         expect(result).toBe(false);
     });
 
-    test('check方法应正确匹配子域名', async () => {
+    test('check should correctly match subdomains', async () => {
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['x.com'] });
 
         expect(await BlackList.check('https://www.x.com/path')).toBe(true);
         expect(await BlackList.check('https://mail.x.com/path')).toBe(true);
     });
 
-    test('check方法应精确匹配域名并拒绝前缀重名域名', async () => {
+    test('check should match a domain exactly and reject prefix-collision domains', async () => {
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['google.com'] });
 
-        // 精确命中
+        // Exact hit
         expect(await BlackList.check('https://google.com/path')).toBe(true);
-        // 二级子域名命中
+        // Second-level subdomain hit
         expect(await BlackList.check('https://mail.google.com/path')).toBe(true);
-        // 前缀重名域名不应误匹配（旧逻辑会误中）
+        // A prefix-collision domain must not match (the old logic would falsely hit)
         expect(await BlackList.check('https://fakegoogle.com/path')).toBe(false);
     });
 
-    test('check方法不再对内置页面特殊处理，仅依据hostname匹配黑名单', async () => {
-        // check() 的职责已收敛为"URL hostname 是否匹配黑名单"，
-        // 内置页面是否跳过由调用方（privateModeHandler 的 isBuiltinPage 检查）决定。
-        // 内置页面 URL 的 hostname 是扩展 ID（chrome.runtime.id），不会出现在黑名单中，
-        // 因此应返回 false。此测试锁定该契约，防止 isBuiltinPage 检查被重新塞回 check()。
+    test('check no longer special-cases builtin pages; it only matches the URL hostname against the blacklist', async () => {
+        // check()'s responsibility has converged to "does the URL hostname match the blacklist";
+        // whether to skip builtin pages is decided by the caller (privateModeHandler's
+        // isBuiltinPage check). The hostname of a builtin page URL is the extension id
+        // (chrome.runtime.id), which never appears in the blacklist, so it should return false.
+        // This test locks that contract to prevent isBuiltinPage checks from being put back into check().
         const blacklist = ['example.com'];
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist });
 
@@ -144,7 +146,7 @@ describe('BlackList 模块', () => {
         expect(result).toBe(false);
     });
 
-    test('set方法应正确设置blacklist', async () => {
+    test('set should correctly set the blacklist', async () => {
         const newBlacklist = ['domain1.com', 'domain2.com'];
         mockChrome.storage.sync.set.mockResolvedValue();
 
@@ -153,7 +155,7 @@ describe('BlackList 模块', () => {
         expect(mockChrome.storage.sync.set).toHaveBeenCalledWith({ blacklist: newBlacklist });
     });
 
-    test('removeBatch方法应批量移除多个URL', async () => {
+    test('removeBatch should remove multiple URLs in bulk', async () => {
         const urls = ['example.com', 'test.com', 'sample.com'];
         const remainingUrl = 'remaining.com';
         const existingBlacklist = [...urls, remainingUrl];
@@ -163,42 +165,42 @@ describe('BlackList 模块', () => {
         mockChrome.storage.sync.set.mockResolvedValue();
 
         const result = await BlackList.removeBatch(urls);
-        expect(result).toBe(3); // 应返回移除的数量
+        expect(result).toBe(3); // should return the number removed
         expect(mockChrome.storage.sync.set).toHaveBeenCalledWith({ blacklist: expectedBlacklist });
     });
 
-    test('removeBatch方法对空数组或无效输入应返回0', async () => {
+    test('removeBatch should return 0 for an empty array or invalid input', async () => {
         const existingBlacklist = ['example.com', 'test.com'];
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: existingBlacklist });
 
-        // 测试空数组
+        // Test empty array
         let result = await BlackList.removeBatch([]);
         expect(result).toBe(0);
         expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
 
-        // 测试null
+        // Test null
         result = await BlackList.removeBatch(null);
         expect(result).toBe(0);
         expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
 
-        // 测试undefined
+        // Test undefined
         result = await BlackList.removeBatch(undefined);
         expect(result).toBe(0);
         expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
     });
 
-    test('removeBatch方法对不存在的URL应正确处理', async () => {
+    test('removeBatch should handle non-existent URLs correctly', async () => {
         const existingBlacklist = ['example.com', 'test.com'];
         const nonExistingUrls = ['nonexisting1.com', 'nonexisting2.com'];
 
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: existingBlacklist });
 
         const result = await BlackList.removeBatch(nonExistingUrls);
-        expect(result).toBe(0); // 没有任何URL被删除
+        expect(result).toBe(0); // no URL was deleted
         expect(mockChrome.storage.sync.set).not.toHaveBeenCalled();
     });
 
-    test('removeBatch方法对部分存在的URL应正确处理', async () => {
+    test('removeBatch should handle partially existing URLs correctly', async () => {
         const existingUrl = 'example.com';
         const nonExistingUrl = 'nonexisting.com';
         const existingBlacklist = [existingUrl, 'test.com'];
@@ -208,13 +210,13 @@ describe('BlackList 模块', () => {
         mockChrome.storage.sync.set.mockResolvedValue();
 
         const result = await BlackList.removeBatch([existingUrl, nonExistingUrl]);
-        expect(result).toBe(1); // 只有一个URL被删除
+        expect(result).toBe(1); // only one URL was deleted
         expect(mockChrome.storage.sync.set).toHaveBeenCalledWith({ blacklist: expectedBlacklist });
     });
 
-    // ===== 缓存行为测试 =====
+    // ===== Cache behavior tests =====
 
-    test('getAll方法应缓存结果，第二次调用不再访问storage', async () => {
+    test('getAll should cache the result; the second call must not hit storage', async () => {
         const mockBlacklist = ['cached.com'];
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: mockBlacklist });
 
@@ -223,35 +225,35 @@ describe('BlackList 模块', () => {
 
         expect(first).toEqual(mockBlacklist);
         expect(second).toEqual(mockBlacklist);
-        // 仅第一次触发 storage 读取
+        // Only the first call triggers a storage read
         expect(mockChrome.storage.sync.get).toHaveBeenCalledTimes(1);
     });
 
-    test('getAll方法缓存命中时返回的是同一引用', async () => {
+    test('getAll should return the same reference on a cache hit', async () => {
         const mockBlacklist = ['ref.com'];
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: mockBlacklist });
 
         const first = await BlackList.getAll();
         const second = await BlackList.getAll();
 
-        // 缓存返回同一数组引用（保留既有行为：写操作就地 mutate）
+        // Cache returns the same array reference (preserving existing behavior: writes mutate in place)
         expect(second).toBe(first);
     });
 
-    test('add方法应更新缓存', async () => {
+    test('add should update the cache', async () => {
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['a.com'] });
         mockChrome.storage.sync.set.mockResolvedValue();
 
         await BlackList.add('b.com');
 
-        // 缓存应包含新增项；再次 getAll 不触发 storage 读取
+        // The cache should contain the new item; a subsequent getAll does not hit storage
         const getCallsBefore = mockChrome.storage.sync.get.mock.calls.length;
         const result = await BlackList.getAll();
         expect(result).toEqual(['a.com', 'b.com']);
         expect(mockChrome.storage.sync.get.mock.calls.length).toBe(getCallsBefore);
     });
 
-    test('set方法应更新缓存', async () => {
+    test('set should update the cache', async () => {
         mockChrome.storage.sync.set.mockResolvedValue();
         const newBlacklist = ['x.com', 'y.com'];
 
@@ -263,7 +265,7 @@ describe('BlackList 模块', () => {
         expect(mockChrome.storage.sync.get.mock.calls.length).toBe(getCallsBefore);
     });
 
-    test('remove方法应更新缓存', async () => {
+    test('remove should update the cache', async () => {
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['a.com', 'b.com'] });
         mockChrome.storage.sync.set.mockResolvedValue();
 
@@ -275,7 +277,7 @@ describe('BlackList 模块', () => {
         expect(mockChrome.storage.sync.get.mock.calls.length).toBe(getCallsBefore);
     });
 
-    test('removeBatch方法应更新缓存', async () => {
+    test('removeBatch should update the cache', async () => {
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['a.com', 'b.com', 'c.com'] });
         mockChrome.storage.sync.set.mockResolvedValue();
 
@@ -287,55 +289,55 @@ describe('BlackList 模块', () => {
         expect(mockChrome.storage.sync.get.mock.calls.length).toBe(getCallsBefore);
     });
 
-    test('check方法缓存命中时不重复读取storage', async () => {
+    test('check should not re-read storage on a cache hit', async () => {
         const blacklist = ['hit.com'];
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist });
 
         await BlackList.check('https://hit.com/path');
         await BlackList.check('https://hit.com/other');
 
-        // 多次 check 仅触发一次 storage 读取
+        // Multiple check calls trigger only one storage read
         expect(mockChrome.storage.sync.get).toHaveBeenCalledTimes(1);
     });
 
-    test('模块加载时应注册chrome.storage.onChanged监听器', () => {
-        // beforeEach 重新 require 使模块再次执行；vi.clearAllMocks 已清空记录，
-        // 因此本次观察到的 addListener 调用来自当前 require。
+    test('should register a chrome.storage.onChanged listener on module load', () => {
+        // beforeEach re-requires so the module executes again; vi.clearAllMocks already
+        // wiped the records, so the addListener call observed here comes from the current require.
         expect(mockChrome.storage.onChanged.addListener).toHaveBeenCalledTimes(1);
-        // 注册的处理器必须是导出的 _onChangedHandler，避免注册了错误的死代码。
+        // The registered handler must be the exported _onChangedHandler, not dead code registered by mistake.
         expect(mockChrome.storage.onChanged.addListener).toHaveBeenCalledWith(_onChangedHandler);
     });
 
-    test('onChanged处理器的具名导出可直接调用', () => {
+    test('the named export of the onChanged handler can be invoked directly', () => {
         expect(typeof _onChangedHandler).toBe('function');
     });
 
-    test('onChanged处理器应在sync区域的blacklist变更时使缓存失效', async () => {
+    test('onChanged handler should invalidate the cache on a sync-area blacklist change', async () => {
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['a.com'] });
 
-        // 首次读取填充缓存
+        // First read populates the cache
         await BlackList.getAll();
         expect(mockChrome.storage.sync.get).toHaveBeenCalledTimes(1);
 
-        // 模拟外部 storage 变更触发 onChanged
+        // Simulate an external storage change triggering onChanged
         _onChangedHandler({ blacklist: { newValue: ['b.com'] } }, 'sync');
 
-        // 缓存失效后再次 getAll 应重新读取 storage
+        // After cache invalidation, getAll should re-read storage
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['b.com'] });
         const result = await BlackList.getAll();
         expect(result).toEqual(['b.com']);
         expect(mockChrome.storage.sync.get).toHaveBeenCalledTimes(2);
     });
 
-    test('onChanged处理器对非sync区域或无blacklist变更不应失效缓存', async () => {
+    test('onChanged handler should not invalidate the cache for non-sync areas or non-blacklist changes', async () => {
         mockChrome.storage.sync.get.mockResolvedValue({ blacklist: ['a.com'] });
 
         await BlackList.getAll();
         expect(mockChrome.storage.sync.get).toHaveBeenCalledTimes(1);
 
-        // local 区域变更不影响 sync 缓存
+        // A local-area change must not affect the sync cache
         _onChangedHandler({ blacklist: { newValue: ['b.com'] } }, 'local');
-        // sync 区域但无 blacklist 键变更
+        // A sync-area change without the blacklist key
         _onChangedHandler({ other: { newValue: 1 } }, 'sync');
 
         const result = await BlackList.getAll();

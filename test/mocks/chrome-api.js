@@ -1,7 +1,7 @@
 import { vi } from 'bun:test';
 
 /**
- * 模拟Chrome扩展API用于测试
+ * Mock Chrome extension APIs for testing.
  */
 
 const mockStorage = {
@@ -57,7 +57,7 @@ const mockRuntime = {
     getURL: vi.fn()
 };
 
-// 设置全局Chrome API模拟
+// Set up the global Chrome API mock
 global.chrome = {
     storage: mockStorage,
     tabs: mockTabs,
@@ -67,11 +67,11 @@ global.chrome = {
     runtime: mockRuntime,
 };
 
-// 重置所有模拟功能
+// Reset all mock implementations
 export function resetMocks() {
     vi.clearAllMocks();
 
-    // 重置storage
+    // Reset storage
     mockStorage.local.get.mockImplementation((keys, callback) => {
         if (callback) callback({});
         return Promise.resolve({});
@@ -92,18 +92,18 @@ export function resetMocks() {
         return Promise.resolve();
     });
 
-    // 重置tabs
+    // Reset tabs
     mockTabs.get.mockResolvedValue({});
     mockTabs.create.mockResolvedValue({});
     mockTabs.remove.mockResolvedValue();
 
-    // 重置runtime
+    // Reset runtime
     mockRuntime.getURL.mockImplementation((path) => `chrome-extension://9527/${path}`);
 
-    // 重置windows
+    // Reset windows
     mockWindows.create.mockResolvedValue({});
     mockWindows.getAll.mockResolvedValue([]);
 
-    // 重置history
+    // Reset history
     mockHistory.deleteUrl.mockResolvedValue();
 }

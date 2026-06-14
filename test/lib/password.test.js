@@ -1,18 +1,18 @@
 import { describe, test, expect, beforeEach, vi, mock } from 'bun:test';
 import { resetMocks } from '../mocks/chrome-api.js';
 
-// 获取mock的chrome对象
+// Get the mocked chrome object
 const mockChrome = global.chrome;
 
-// 导入被测试的模块
+// Import the module under test
 let getPassword, setPassword, isPasswordOptionEnabled, setPasswordOption;
 
-describe('Password 模块', () => {
-    // 在每个测试前重置模拟
+describe('Password module', () => {
+    // Reset mocks before each test
     beforeEach(() => {
         resetMocks();
 
-        // 重新导入模块
+        // Re-import the module
         const passwordModule = require('../../lib/password.js');
         getPassword = passwordModule.getPassword;
         setPassword = passwordModule.setPassword;
@@ -20,8 +20,8 @@ describe('Password 模块', () => {
         setPasswordOption = passwordModule.setPasswordOption;
     });
 
-    test('getPassword应返回空字符串当存储中没有password', async () => {
-        // 模拟chrome.storage.sync.get返回空对象
+    test('getPassword should return an empty string when storage has no password', async () => {
+        // Mock chrome.storage.sync.get to return an empty object
         mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             if (callback) callback({});
             return Promise.resolve({});
@@ -32,10 +32,10 @@ describe('Password 模块', () => {
         expect(mockChrome.storage.sync.get).toHaveBeenCalled();
     });
 
-    test('getPassword应返回存储中的password值', async () => {
+    test('getPassword should return the stored password value', async () => {
         const testPassword = '123456';
 
-        // 模拟chrome.storage.sync.get返回包含password的对象
+        // Mock chrome.storage.sync.get to return an object containing password
         mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             if (callback) callback({ password: testPassword });
             return Promise.resolve({ password: testPassword });
@@ -46,10 +46,10 @@ describe('Password 模块', () => {
         expect(mockChrome.storage.sync.get).toHaveBeenCalled();
     });
 
-    test('setPassword应正确设置password', async () => {
+    test('setPassword should correctly set the password', async () => {
         const testPassword = '123456';
 
-        // 模拟chrome.storage.sync.set
+        // Mock chrome.storage.sync.set
         mockChrome.storage.sync.set.mockImplementation((items, callback) => {
             if (callback) callback();
             return Promise.resolve();
@@ -59,8 +59,8 @@ describe('Password 模块', () => {
         expect(mockChrome.storage.sync.set).toHaveBeenCalled();
     });
 
-    test('isPasswordOptionEnabled应返回undefined当存储中没有passwordOption', async () => {
-        // 模拟chrome.storage.sync.get返回空对象
+    test('isPasswordOptionEnabled should return undefined when storage has no passwordOption', async () => {
+        // Mock chrome.storage.sync.get to return an empty object
         mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             if (callback) callback({});
             return Promise.resolve({});
@@ -71,8 +71,8 @@ describe('Password 模块', () => {
         expect(mockChrome.storage.sync.get).toHaveBeenCalled();
     });
 
-    test('isPasswordOptionEnabled应返回存储中的passwordOption值', async () => {
-        // 模拟chrome.storage.sync.get返回包含passwordOption的对象
+    test('isPasswordOptionEnabled should return the stored passwordOption value', async () => {
+        // Mock chrome.storage.sync.get to return an object containing passwordOption
         mockChrome.storage.sync.get.mockImplementation((keys, callback) => {
             if (callback) callback({ passwordOption: true });
             return Promise.resolve({ passwordOption: true });
@@ -83,21 +83,21 @@ describe('Password 模块', () => {
         expect(mockChrome.storage.sync.get).toHaveBeenCalled();
     });
 
-    test('setPasswordOption应正确设置passwordOption', async () => {
-        // 模拟chrome.storage.sync.set
+    test('setPasswordOption should correctly set passwordOption', async () => {
+        // Mock chrome.storage.sync.set
         mockChrome.storage.sync.set.mockImplementation((items, callback) => {
             if (callback) callback();
             return Promise.resolve();
         });
 
-        // 测试设置为true
+        // Test setting to true
         await setPasswordOption(true);
         expect(mockChrome.storage.sync.set).toHaveBeenCalled();
 
-        // 重置mock
+        // Reset mock
         mockChrome.storage.sync.set.mockClear();
 
-        // 测试设置为false
+        // Test setting to false
         await setPasswordOption(false);
         expect(mockChrome.storage.sync.set).toHaveBeenCalled();
     });

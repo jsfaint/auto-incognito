@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 处理选中的书签节点：提取主域名并合并入黑名单
+    // Process selected bookmark nodes: extract primary domains and merge them into the blacklist
     const processBookmarks = async (selectedNodes) => {
         try {
             let count = 0;

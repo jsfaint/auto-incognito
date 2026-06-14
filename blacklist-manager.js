@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const exportButton = document.getElementById('exportButton');
     const importBookmarkButton = document.getElementById('importBookmarkButton');
 
-    // 导入/导出/书签导入：调用 lib/blacklist-io.js 的共享实现，并补充页面级状态提示
+    // Import/export/bookmark-import: delegate to the shared impl in lib/blacklist-io.js, with page-level status feedback
     if (importButton && exportButton && importBookmarkButton) {
         importButton.addEventListener('click', async () => {
             const input = document.createElement('input');

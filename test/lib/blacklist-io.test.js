@@ -3,36 +3,36 @@ import { resetMocks } from '../mocks/chrome-api.js';
 
 const mockChrome = global.chrome;
 
-// 被测函数：每个测试重新 require 以获得干净闭包
+// Functions under test: re-required per test for a clean closure
 let exportBlacklist;
 let importBlacklistFromFile;
 let openBookmarkImport;
 
-// 存放 document / BlackList / findInWhitelist 的原始值，测试后还原
+// Hold original values of document / BlackList / findInWhitelist to restore after tests
 let originalDocument;
 let originalBlackList;
 let originalFindInWhitelist;
 
-describe('blacklist-io 模块', () => {
+describe('blacklist-io module', () => {
     beforeEach(() => {
         resetMocks();
 
-        // 保存可能存在的全局引用，测试后还原
+        // Save any existing global references to restore after tests
         originalDocument = global.document;
         originalBlackList = global.BlackList;
         originalFindInWhitelist = global.findInWhitelist;
 
-        // blacklist-io.js 依赖全局 BlackList；用 require 加载真实模块并赋给 global
+        // blacklist-io.js depends on the global BlackList; load the real module via require and assign to global
         delete require.cache[require.resolve('../../lib/blacklist.js')];
         global.BlackList = require('../../lib/blacklist.js').BlackList;
 
-        // findInWhitelist 作为全局函数
+        // findInWhitelist as a global function
         global.findInWhitelist = require('../../lib/whitelist.js').findInWhitelist;
 
-        // document 在 Bun 测试环境不存在，需要手动 mock
+        // document does not exist in the Bun test environment; mock it manually
         global.document = { createElement: vi.fn() };
 
-        // 重新 require 被测模块
+        // Re-require the module under test
         delete require.cache[require.resolve('../../lib/blacklist-io.js')];
         const mod = require('../../lib/blacklist-io.js');
         exportBlacklist = mod.exportBlacklist;
@@ -41,7 +41,7 @@ describe('blacklist-io 模块', () => {
     });
 
     afterAll(() => {
-        // 还原全局污染
+        // Restore global pollution
         if (originalDocument === undefined) delete global.document;
         else global.document = originalDocument;
         if (originalBlackList === undefined) delete global.BlackList;
@@ -51,7 +51,7 @@ describe('blacklist-io 模块', () => {
     });
 
     describe('exportBlacklist', () => {
-        test('应读取黑名单并触发文件下载', async () => {
+        test('should read the blacklist and trigger a file download', async () => {
             const blacklist = ['example.com', 'test.com'];
             vi.spyOn(global.BlackList, 'getAll').mockResolvedValue(blacklist);
 
@@ -63,36 +63,36 @@ describe('blacklist-io 模块', () => {
 
             await exportBlacklist();
 
-            // 验证读取黑名单
+            // Verify the blacklist was read
             expect(global.BlackList.getAll).toHaveBeenCalledTimes(1);
-            // 验证创建了 Blob（通过 createObjectURL 入参）
+            // Verify a Blob was created (via the createObjectURL argument)
             expect(createObjectURL).toHaveBeenCalledTimes(1);
             const blob = createObjectURL.mock.calls[0][0];
             expect(blob).toBeInstanceOf(Blob);
-            // 验证下载锚点配置
+            // Verify the download anchor configuration
             expect(anchor.href).toBe('blob:test-url');
             expect(anchor.download).toBe('blacklist.txt');
             expect(anchor.click).toHaveBeenCalledTimes(1);
-            // 验证释放对象 URL
+            // Verify the object URL was released
             expect(revokeObjectURL).toHaveBeenCalledWith('blob:test-url');
         });
     });
 
     describe('importBlacklistFromFile', () => {
-        test('应合并文件内容与现有黑名单并去重写入', async () => {
+        test('should merge file contents with the existing blacklist and dedupe on write', async () => {
             const file = { text: vi.fn().mockResolvedValue('new1.com\nnew2.com\nnew1.com') };
             vi.spyOn(global.BlackList, 'getAll').mockResolvedValue(['existing.com', 'new1.com']);
             const setSpy = vi.spyOn(global.BlackList, 'set').mockResolvedValue(true);
 
             const count = await importBlacklistFromFile(file);
 
-            // 返回值 = 通过白名单过滤的文件行数（文件内重复也算）
+            // Return value = file lines passing whitelist filter (in-file duplicates count too)
             expect(count).toBe(3);
-            // 写入结果 = 现有 + 过滤后做 Set 去重，new1.com 不重复
+            // Written result = existing + filtered, deduped via Set; new1.com is not duplicated
             expect(setSpy).toHaveBeenCalledWith(['existing.com', 'new1.com', 'new2.com']);
         });
 
-        test('应过滤掉白名单中的 URL', async () => {
+        test('should filter out whitelisted URLs', async () => {
             const file = {
                 text: vi.fn().mockResolvedValue('about:blank\nchrome://settings\nexample.com'),
             };
@@ -101,12 +101,12 @@ describe('blacklist-io 模块', () => {
 
             const count = await importBlacklistFromFile(file);
 
-            // 仅 example.com 通过白名单过滤
+            // Only example.com passes the whitelist filter
             expect(count).toBe(1);
             expect(setSpy).toHaveBeenCalledWith(['example.com']);
         });
 
-        test('应忽略空行', async () => {
+        test('should ignore blank lines', async () => {
             const file = {
                 text: vi.fn().mockResolvedValue('a.com\n\n  \nb.com'),
             };
@@ -119,22 +119,22 @@ describe('blacklist-io 模块', () => {
             expect(setSpy).toHaveBeenCalledWith(['a.com', 'b.com']);
         });
 
-        test('文件内容与现有黑名单完全重复时应去重写入并返回过滤行数', async () => {
+        test('should dedupe on write and return the filtered line count when file fully duplicates the blacklist', async () => {
             const file = { text: vi.fn().mockResolvedValue('existing.com\nabout:blank') };
             vi.spyOn(global.BlackList, 'getAll').mockResolvedValue(['existing.com']);
             const setSpy = vi.spyOn(global.BlackList, 'set').mockResolvedValue(true);
 
             const count = await importBlacklistFromFile(file);
 
-            // about:blank 被白名单过滤，仅 existing.com 计入返回值
+            // about:blank is filtered by the whitelist; only existing.com counts toward the return value
             expect(count).toBe(1);
-            // 合并 Set 去重后只有 existing.com（一次 set 写入）
+            // After Set dedupe only existing.com remains (one set write)
             expect(setSpy).toHaveBeenCalledWith(['existing.com']);
         });
     });
 
     describe('openBookmarkImport', () => {
-        test('应调用 chrome.tabs.create 打开 bookmark.html', () => {
+        test('should call chrome.tabs.create to open bookmark.html', () => {
             openBookmarkImport();
 
             expect(mockChrome.runtime.getURL).toHaveBeenCalledWith('bookmark.html');

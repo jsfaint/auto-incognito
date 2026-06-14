@@ -1,10 +1,10 @@
 import { beforeEach, vi } from 'bun:test';
 import { resetMocks } from './mocks/chrome-api.js';
 
-// 模拟 importScripts
+// Stub importScripts
 global.importScripts = vi.fn();
 
-// 在每个测试前重置所有模拟
+// Reset all mocks before each test
 beforeEach(() => {
     vi.clearAllMocks();
     resetMocks();

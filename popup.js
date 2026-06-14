@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert(chrome.i18n.getMessage("info_clear_password"));
     });
 
-    // 导入/导出/书签导入按钮：调用 lib/blacklist-io.js 的共享实现
+    // Import/export/bookmark-import buttons: delegate to the shared impl in lib/blacklist-io.js
     btnExport.addEventListener("click", exportBlacklist);
 
     btnImport.addEventListener('click', () => {
