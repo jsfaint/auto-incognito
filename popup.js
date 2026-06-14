@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             chkPasswordOption.checked = passwordOptionValue;
         }
+        return passwordOptionValue;
     };
 
     // Initial window state
@@ -95,11 +96,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // Initialize all options
+    // Initialize all options; returns the resolved passwordOptionValue
     const OptionInit = async () => {
-        await initPrivateOption();
-        await initPasswordOption();
-        await initWindowState();
+        const [, passwordOptionValue] = await Promise.all([
+            initPrivateOption(),
+            initPasswordOption(),
+            initWindowState(),
+        ]);
+        return passwordOptionValue;
     };
 
     btnAddCurrentTab.addEventListener('click', async () => {
@@ -255,10 +259,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Start from here
-    await OptionInit();
+    const passwordOptionValue = await OptionInit();
 
     const passwordValue = await getPassword();
-    const passwordOptionValue = await isPasswordOptionEnabled();
 
     if (passwordOptionValue) {
         if (passwordValue.length == 0) {
