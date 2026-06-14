@@ -14,6 +14,11 @@ const mockStorage = {
         get: vi.fn(),
         set: vi.fn(),
         clear: vi.fn()
+    },
+    onChanged: {
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        hasListener: vi.fn()
     }
 };
 
