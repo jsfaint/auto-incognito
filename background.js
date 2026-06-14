@@ -65,9 +65,10 @@ const historyHandler = async (details) => {
     try {
         const url = details.url;
 
-        // 内置扩展页面（blacklist-manager.html / bookmark.html）也需清除历史，
-        // 与 privateModeHandler 对内置页面的识别保持一致。
-        // isBuiltinPage 同步且廉价，置前可短路掉后续的 storage 读取。
+        // Builtin extension pages (blacklist-manager.html / bookmark.html) must
+        // also be cleared, consistent with privateModeHandler's builtin check.
+        // isBuiltinPage is synchronous and cheap; placing it first short-circuits
+        // the subsequent storage read.
         const found = BlackList.isBuiltinPage(url) || await BlackList.check(url);
         if (!found) {
             return;
